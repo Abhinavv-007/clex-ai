@@ -83,6 +83,47 @@
             animation: heroPulseIn 0.6s ease-out 1.0s both;
         }
 
+        /* Provider Orbit Tooltips */
+        .orbit-tooltip {
+            position: absolute;
+            bottom: calc(100% + 15px);
+            left: 50%;
+            transform: translateX(-50%) translateY(10px) scale(0.95);
+            background: rgba(2, 5, 15, 0.95);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 1rem;
+            border-radius: 1rem;
+            width: 240px;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 50;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), 0 0 20px rgba(34, 211, 238, 0.1);
+            text-align: left;
+        }
+
+        .orbit-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 6px;
+            border-style: solid;
+            border-color: rgba(255, 255, 255, 0.1) transparent transparent transparent;
+        }
+
+        .orbit-item:hover .orbit-tooltip,
+        .orbit-item-reverse:hover .orbit-tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0) scale(1);
+        }
+
         /* Feature card number */
         .feature-number {
             position: absolute;
@@ -405,36 +446,69 @@
                     <!-- NVIDIA – top -->
                     <div class="absolute" style="top:-24px; left:50%; transform:translateX(-50%)">
                         <div class="orbit-item w-14 h-14 rounded-xl bg-[#76b900]/10 backdrop-blur-md border border-[#76b900]/30 flex items-center justify-center shadow-[0_0_20px_rgba(118,185,0,0.15)] hover:scale-110 transition-transform cursor-pointer"
-                            title="NVIDIA">
+                           >
                             <span class="text-[#76b900] font-black text-xs">NV</span>
+                            <div class="orbit-tooltip font-sans">
+                                <div class="font-bold text-[#76b900] mb-2 border-b border-white/10 pb-2">NVIDIA</div>
+                                <div class="flex justify-between text-xs mb-1"><span>Llama 3.3 Nemotron</span><span
+                                        class="text-gray-400">128K / 8K</span></div>
+                                <div class="flex justify-between text-xs"><span>Nemotron 3 Nano</span><span
+                                        class="text-gray-400">4K / 4K</span></div>
+                            </div>
                         </div>
                     </div>
                     <!-- Meta – right -->
                     <div class="absolute" style="top:50%; right:-24px; transform:translateY(-50%)">
                         <div class="orbit-item w-14 h-14 rounded-xl bg-[#0081FB]/10 backdrop-blur-md border border-[#0081FB]/30 flex items-center justify-center shadow-[0_0_20px_rgba(0,129,251,0.15)] hover:scale-110 transition-transform cursor-pointer"
-                            title="Meta">
+                           >
                             <span class="text-[#0081FB] font-black text-xs">M</span>
+                            <div class="orbit-tooltip font-sans">
+                                <div class="font-bold text-[#0081FB] mb-2 border-b border-white/10 pb-2">Meta</div>
+                                <div class="flex justify-between text-xs mb-1"><span>Llama 3.3 70B</span><span
+                                        class="text-gray-400">128K / 8K</span></div>
+                                <div class="flex justify-between text-xs"><span>Llama 4 Maverick</span><span
+                                        class="text-gray-400">128K / 8K</span></div>
+                            </div>
                         </div>
                     </div>
                     <!-- DeepSeek – bottom-right -->
                     <div class="absolute" style="bottom:15%; right:5%">
                         <div class="orbit-item w-14 h-14 rounded-xl bg-[#4f5bd5]/10 backdrop-blur-md border border-[#4f5bd5]/30 flex items-center justify-center shadow-[0_0_20px_rgba(79,91,213,0.15)] hover:scale-110 transition-transform cursor-pointer"
-                            title="DeepSeek">
+                           >
                             <span class="text-[#4f5bd5] font-black text-xs">DS</span>
+                            <div class="orbit-tooltip font-sans">
+                                <div class="font-bold text-[#4f5bd5] mb-2 border-b border-white/10 pb-2">DeepSeek</div>
+                                <div class="flex justify-between text-xs mb-1"><span>DeepSeek V3.2</span><span
+                                        class="text-gray-400">64K / 8K</span></div>
+                                <div class="flex justify-between text-xs"><span>R1 Distill Qwen</span><span
+                                        class="text-gray-400">32K / 4K</span></div>
+                            </div>
                         </div>
                     </div>
                     <!-- OpenAI – bottom-left -->
                     <div class="absolute" style="bottom:15%; left:5%">
                         <div class="orbit-item w-14 h-14 rounded-xl bg-white/[0.06] backdrop-blur-md border border-white/20 flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.08)] hover:scale-110 transition-transform cursor-pointer"
-                            title="OpenAI">
+                           >
                             <span class="text-white font-black text-xs">AI</span>
+                            <div class="orbit-tooltip font-sans">
+                                <div class="font-bold text-white mb-2 border-b border-white/10 pb-2">OpenAI</div>
+                                <div class="flex justify-between text-xs mb-1"><span>GPT-OSS 120B</span><span
+                                        class="text-gray-400">128K / 4K</span></div>
+                                <div class="flex justify-between text-xs"><span>Whisper Large V3</span><span
+                                        class="text-gray-400">Audio / Text</span></div>
+                            </div>
                         </div>
                     </div>
                     <!-- Google – left -->
                     <div class="absolute" style="top:50%; left:-24px; transform:translateY(-50%)">
                         <div class="orbit-item w-14 h-14 rounded-xl bg-[#4285F4]/10 backdrop-blur-md border border-[#4285F4]/30 flex items-center justify-center shadow-[0_0_20px_rgba(66,133,244,0.15)] hover:scale-110 transition-transform cursor-pointer"
-                            title="Google">
+                           >
                             <span class="text-[#4285F4] font-black text-xs">G</span>
+                            <div class="orbit-tooltip font-sans">
+                                <div class="font-bold text-[#4285F4] mb-2 border-b border-white/10 pb-2">Google</div>
+                                <div class="flex justify-between text-xs"><span>Gemma 3 27B-IT</span><span
+                                        class="text-gray-400">8K / 4K</span></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -444,22 +518,41 @@
                     <!-- Qwen – top -->
                     <div class="absolute" style="top:-20px; left:50%; transform:translateX(-50%)">
                         <div class="orbit-item-reverse w-12 h-12 rounded-xl bg-[#6366f1]/10 backdrop-blur-md border border-[#6366f1]/30 flex items-center justify-center shadow-[0_0_15px_rgba(99,102,241,0.15)] hover:scale-110 transition-transform cursor-pointer"
-                            title="Qwen">
+                           >
                             <span class="text-[#6366f1] font-black text-[10px]">QW</span>
+                            <div class="orbit-tooltip font-sans">
+                                <div class="font-bold text-[#6366f1] mb-2 border-b border-white/10 pb-2">Qwen</div>
+                                <div class="flex justify-between text-xs mb-1"><span>Qwen 3.5 397B</span><span
+                                        class="text-gray-400">128K / 8K</span></div>
+                                <div class="flex justify-between text-xs"><span>Qwen3 Coder 480B</span><span
+                                        class="text-gray-400">256K / 8K</span></div>
+                            </div>
                         </div>
                     </div>
                     <!-- Mistral – bottom-right -->
                     <div class="absolute" style="bottom:10%; right:0">
                         <div class="orbit-item-reverse w-12 h-12 rounded-xl bg-[#FF7000]/10 backdrop-blur-md border border-[#FF7000]/30 flex items-center justify-center shadow-[0_0_15px_rgba(255,112,0,0.15)] hover:scale-110 transition-transform cursor-pointer"
-                            title="Mistral">
+                           >
                             <span class="text-[#FF7000] font-black text-[10px]">MI</span>
+                            <div class="orbit-tooltip font-sans">
+                                <div class="font-bold text-[#FF7000] mb-2 border-b border-white/10 pb-2">Mistral</div>
+                                <div class="flex justify-between text-xs mb-1"><span>Mistral Large 3</span><span
+                                        class="text-gray-400">128K / 8K</span></div>
+                                <div class="flex justify-between text-xs"><span>Devstral 2 123B</span><span
+                                        class="text-gray-400">256K / 8K</span></div>
+                            </div>
                         </div>
                     </div>
                     <!-- IBM – bottom-left -->
                     <div class="absolute" style="bottom:10%; left:0">
                         <div class="orbit-item-reverse w-12 h-12 rounded-xl bg-[#BE95FF]/10 backdrop-blur-md border border-[#BE95FF]/30 flex items-center justify-center shadow-[0_0_15px_rgba(190,149,255,0.15)] hover:scale-110 transition-transform cursor-pointer"
-                            title="IBM">
+                           >
                             <span class="text-[#BE95FF] font-black text-[10px]">IBM</span>
+                            <div class="orbit-tooltip font-sans">
+                                <div class="font-bold text-[#BE95FF] mb-2 border-b border-white/10 pb-2">IBM</div>
+                                <div class="flex justify-between text-xs"><span>Granite 3.3 8B</span><span
+                                        class="text-gray-400">32K / 4K</span></div>
+                            </div>
                         </div>
                     </div>
                 </div>
