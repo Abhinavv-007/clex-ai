@@ -124,8 +124,9 @@ app.get('*', (req, res) => {
 });
 
 // ─── Start Server ───────────────────────────────────────
-app.listen(PORT, () => {
-    console.log(`
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`
   ╔═══════════════════════════════════════╗
   ║          CLEX.IN Server v2.0          ║
   ╠═══════════════════════════════════════╣
@@ -146,8 +147,12 @@ app.listen(PORT, () => {
   ╚═══════════════════════════════════════╝
   `);
 
-    if (!process.env.NVIDIA_API_KEY) {
-        console.log('  ⚠️  Set NVIDIA_API_KEY to enable AI chat:');
-        console.log('     NVIDIA_API_KEY="nvapi-xxx" node server.js\n');
-    }
-});
+        if (!process.env.NVIDIA_API_KEY) {
+            console.log('  ⚠️  Set NVIDIA_API_KEY to enable AI chat:');
+            console.log('     NVIDIA_API_KEY="nvapi-xxx" node server.js\\n');
+        }
+    });
+}
+
+// Export for Vercel serverless functions
+module.exports = app;
