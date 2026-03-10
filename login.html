@@ -69,11 +69,17 @@
                                 class="w-3.5 h-3.5 rounded border-white/20 bg-transparent accent-cyan-400">
                             <span class="text-xs text-gray-500">Remember me</span>
                         </label>
-                        <a href="#" class="text-xs text-cyan-400/70 hover:text-cyan-400 transition-colors">Forgot
+                        <a href="#" onclick="resetPassword(event)"
+                            class="text-xs text-cyan-400/70 hover:text-cyan-400 transition-colors">Forgot
                             password?</a>
                     </div>
 
-                    <button type="submit" class="login-btn">Sign In</button>
+                    <button type="submit" class="login-btn mb-3">Sign In</button>
+
+                    <button type="button" onclick="sendPasswordlessLink(event)"
+                        class="w-full bg-white/5 border border-white/10 text-white font-bold py-3.5 px-4 rounded-xl transition-all hover:bg-white/10 hover:border-white/20">
+                        Send Magic Link
+                    </button>
 
                     <div class="relative my-8">
                         <div class="absolute inset-0 flex items-center">
@@ -85,7 +91,7 @@
 
                     <!-- Social Logins -->
                     <div class="grid grid-cols-2 gap-3">
-                        <button type="button"
+                        <button type="button" onclick="signInWithGithub()"
                             class="flex items-center justify-center gap-2 bg-white/3 border border-white/6 rounded-lg py-2.5 text-gray-400 hover:text-white hover:bg-white/6 hover:border-white/15 transition-all text-sm">
                             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                                 <path
@@ -93,7 +99,7 @@
                             </svg>
                             GitHub
                         </button>
-                        <button type="button"
+                        <button type="button" onclick="signInWithGoogle()"
                             class="flex items-center justify-center gap-2 bg-white/3 border border-white/6 rounded-lg py-2.5 text-gray-400 hover:text-white hover:bg-white/6 hover:border-white/15 transition-all text-sm">
                             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                                 <path
@@ -157,7 +163,7 @@
                     </div>
 
                     <div class="grid grid-cols-2 gap-3">
-                        <button type="button"
+                        <button type="button" onclick="signInWithGithub()"
                             class="flex items-center justify-center gap-2 bg-white/3 border border-white/6 rounded-lg py-2.5 text-gray-400 hover:text-white hover:bg-white/6 hover:border-white/15 transition-all text-sm">
                             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                                 <path
@@ -165,7 +171,7 @@
                             </svg>
                             GitHub
                         </button>
-                        <button type="button"
+                        <button type="button" onclick="signInWithGoogle()"
                             class="flex items-center justify-center gap-2 bg-white/3 border border-white/6 rounded-lg py-2.5 text-gray-400 hover:text-white hover:bg-white/6 hover:border-white/15 transition-all text-sm">
                             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                                 <path
@@ -199,8 +205,31 @@
     </div>
 
     <script src="shared.js"></script>
-    <script>
-        function switchTab(tab) {
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, GithubAuthProvider, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCkq2q4kxUyY-Cj2YTNXweI7ckzIx7eots",
+            authDomain: "clex-in.firebaseapp.com",
+            projectId: "clex-in",
+            storageBucket: "clex-in.firebasestorage.app",
+            messagingSenderId: "1050016400675",
+            appId: "1:1050016400675:web:32eaedd53bc82d2663f896",
+            measurementId: "G-P5RC17ZCY2"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Providers
+        const googleProvider = new GoogleAuthProvider();
+        const githubProvider = new GithubAuthProvider();
+
+        // Switch Tabs Logic
+        window.switchTab = function (tab) {
             const signinTab = document.getElementById('tab-signin');
             const signupTab = document.getElementById('tab-signup');
             const signinForm = document.getElementById('form-signin');
@@ -221,21 +250,117 @@
                 signupForm.classList.remove('hidden');
                 signinForm.classList.add('hidden');
             }
-        }
+        };
 
-        function handleSignIn(e) {
-            e.preventDefault();
-            // Store logged in state
+        const showError = (error) => {
+            alert(error.message);
+            console.error(error);
+        };
+
+        const proceedToDashboard = () => {
             localStorage.setItem('clex_logged_in', 'true');
             window.location.href = 'index.html';
-        }
+        };
 
-        function handleSignUp(e) {
+        // --- Handlers ---
+        window.handleSignIn = async function (e) {
             e.preventDefault();
-            localStorage.setItem('clex_logged_in', 'true');
-            window.location.href = 'index.html';
+            const email = e.target.querySelector('input[type="email"]').value;
+            const password = e.target.querySelector('input[type="password"]').value;
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                proceedToDashboard();
+            } catch (error) {
+                showError(error);
+            }
+        };
+
+        window.handleSignUp = async function (e) {
+            e.preventDefault();
+            const email = e.target.querySelector('input[type="email"]').value;
+            const password = e.target.querySelector('input[type="password"]').value;
+
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+                proceedToDashboard();
+            } catch (error) {
+                showError(error);
+            }
+        };
+
+        window.signInWithGoogle = async function () {
+            try {
+                await signInWithPopup(auth, googleProvider);
+                proceedToDashboard();
+            } catch (error) {
+                showError(error);
+            }
+        };
+
+        window.signInWithGithub = async function () {
+            try {
+                await signInWithPopup(auth, githubProvider);
+                proceedToDashboard();
+            } catch (error) {
+                showError(error);
+            }
+        };
+
+        window.resetPassword = async function (e) {
+            e.preventDefault();
+            const email = document.querySelector('#form-signin input[type="email"]').value;
+            if (!email) {
+                alert("Please enter your email address first");
+                return;
+            }
+            try {
+                await sendPasswordResetEmail(auth, email);
+                alert("Password reset email sent!");
+            } catch (error) {
+                showError(error);
+            }
+        };
+
+        window.sendPasswordlessLink = async function (e) {
+            e.preventDefault();
+            const email = document.querySelector('#form-signin input[type="email"]').value;
+            if (!email) {
+                alert("Please enter your email address first");
+                return;
+            }
+
+            const actionCodeSettings = {
+                url: window.location.origin + '/login.html',
+                handleCodeInApp: true
+            };
+
+            try {
+                await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+                window.localStorage.setItem('emailForSignIn', email);
+                alert("Sign-in link sent to your email!");
+            } catch (error) {
+                showError(error);
+            }
+        };
+
+        // --- Check for Passwordless Link on Load ---
+        if (isSignInWithEmailLink(auth, window.location.href)) {
+            let email = window.localStorage.getItem('emailForSignIn');
+            if (!email) {
+                email = window.prompt('Please provide your email for confirmation');
+            }
+            signInWithEmailLink(auth, email, window.location.href)
+                .then((result) => {
+                    window.localStorage.removeItem('emailForSignIn');
+                    proceedToDashboard();
+                })
+                .catch((error) => {
+                    showError(error);
+                });
         }
     </script>
 </body>
 
 </html>
+```
