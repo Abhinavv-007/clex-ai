@@ -73,33 +73,21 @@
 
       /* Typewriter Animation styling */
       .typewriter-text {
-        border-right: 0.15em solid #22d3ee;
+        border-right: 0.15em solid transparent;
         white-space: nowrap;
         overflow: hidden;
         display: inline-block;
         vertical-align: bottom;
-        max-width: fit-content;
       }
 
       .typewriter-text.typing {
-        animation:
-          typing 2.5s steps(30, end) forwards,
-          blinkTyping 0.75s step-end infinite;
+        border-right-color: #22d3ee;
+        animation: blinkTyping 0.75s step-end infinite;
       }
 
       .typewriter-text.done {
-        border-right: none;
+        border-right-color: transparent;
         animation: none;
-      }
-
-      @keyframes typing {
-        from {
-          width: 0;
-        }
-
-        to {
-          width: 100%;
-        }
       }
 
       @keyframes blinkTyping {
@@ -1933,24 +1921,52 @@
         const line1 = document.getElementById("typewriter-line1");
         const line2 = document.getElementById("typewriter-line2");
 
+        // Prepare elements initially
+        line1.style.width = "0px";
+        line2.style.width = "0px";
+
+        const typeText = (el, text, duration) => {
+          return new Promise((resolve) => {
+            // Temporarily allow it to size itself to measure target width
+            el.style.width = "auto";
+            el.style.maxWidth = "none";
+            const targetWidth = el.scrollWidth;
+            el.style.width = "0px";
+
+            // Animate to target width
+            const animation = el.animate(
+              [{ width: "0px" }, { width: targetWidth + "px" }],
+              {
+                duration: duration,
+                easing: `steps(${text.length}, end)`,
+                fill: "forwards",
+              },
+            );
+
+            animation.onfinish = () => {
+              el.style.width = "auto"; // let it naturally fit after typing
+              resolve();
+            };
+          });
+        };
+
         // Start line 1 after initial hero fade up
-        setTimeout(() => {
+        setTimeout(async () => {
           line1.classList.add("typing");
+          await typeText(line1, "Hundreds of AI", 2000);
 
-          // When line 1 finishes, start line 2
+          line1.classList.remove("typing");
+          line1.classList.add("done");
+
+          line2.classList.add("typing");
+          await typeText(line2, "Infinite Possibilities", 2500);
+
           setTimeout(() => {
-            line1.classList.remove("typing");
-            line1.classList.add("done");
-            line2.classList.add("typing");
-
-            // When line 2 finishes, just blink or stop the cursor
-            setTimeout(() => {
-              line2.style.borderRightColor = "transparent"; // Optional: stop blinking at end
-            }, 2500);
-          }, 2500); // Wait for line 1 to type (matches CSS duration)
-        }, 800); // Wait for heroFadeUp
+            line2.classList.remove("typing");
+            line2.classList.add("done");
+          }, 3000);
+        }, 1200); // Wait for heroFadeUp
       });
     </script>
   </body>
 </html>
-```
