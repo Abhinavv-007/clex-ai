@@ -83,6 +83,13 @@ async function requireFirebaseAuth(req, res, next) {
 }
 
 // Serve static files
+// WebContainers require Cross-Origin Isolation (COOP + COEP headers)
+// to enable SharedArrayBuffer. We set these only for the playground page.
+app.get('/playground.html', (req, res, next) => {
+    res.set('Cross-Origin-Opener-Policy', 'same-origin');
+    res.set('Cross-Origin-Embedder-Policy', 'credentialless');
+    next();
+});
 app.use(express.static(path.join(__dirname)));
 
 // ─── Chat Completions Proxy ─────────────────────────────
@@ -145,7 +152,10 @@ app.post('/api/chat', requireFirebaseAuth, async (req, res) => {
         const timeoutId = setTimeout(abort, timeoutMs);
 
         const upstreamChatUrl =
-            process.env.CLEX_CHAT_COMPLETIONS_URL || 'https://api.clex.in/v1/chat/completions';
+            process.env.CLEX_CHAT_COMPLETIONS_URL ||
+            (process.env.CLEX_API_KEY
+                ? 'https://api.clex.in/v1/chat/completions'
+                : 'https://integrate.api.nvidia.com/v1/chat/completions');
 
         const upstreamRes = await fetch(upstreamChatUrl, {
             method: 'POST',

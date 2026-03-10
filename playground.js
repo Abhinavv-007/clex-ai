@@ -228,7 +228,7 @@ function setEditorDoc(text, path) {
       basicSetup,
       oneDark,
       langExt,
-      EditorView.updateListener.of(() => {}),
+      EditorView.updateListener.of(() => { }),
     ],
   });
   editorView.setState(newState);
@@ -295,15 +295,34 @@ bootBtn.addEventListener("click", async () => {
   if (wc) return;
   logsEl.textContent = "";
   log("Booting WebContainer...");
-  wc = await WebContainer.boot();
-  initEditor();
-  setButtons({ booted: true });
-  wc.on("server-ready", (port, url) => {
-    previewFrame.src = url;
-    previewUrlEl.textContent = `Preview URL: ${url}`;
-  });
-  await mountTemplate(templateSelect.value);
-  log("Sandbox ready. Run npm install, then npm run dev.");
+  bootBtn.disabled = true;
+  bootBtn.textContent = "Booting...";
+
+  try {
+    // Add a 30-second timeout to prevent infinite hang
+    const bootPromise = WebContainer.boot();
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("Boot timed out after 30 seconds. WebContainers require a modern browser with SharedArrayBuffer support (Chrome/Edge). Try refreshing or using a supported browser.")), 30000)
+    );
+    wc = await Promise.race([bootPromise, timeoutPromise]);
+    initEditor();
+    setButtons({ booted: true });
+    wc.on("server-ready", (port, url) => {
+      previewFrame.src = url;
+      previewUrlEl.textContent = `Preview URL: ${url}`;
+    });
+    await mountTemplate(templateSelect.value);
+    log("Sandbox ready. Run npm install, then npm run dev.");
+  } catch (err) {
+    log(`[Error] Failed to boot WebContainer: ${err.message}`);
+    log("WebContainers require SharedArrayBuffer support.");
+    log("Make sure you are using Chrome or Edge, and the page is served with proper COOP/COEP headers.");
+    wc = null;
+    setButtons({ booted: false });
+  } finally {
+    bootBtn.disabled = false;
+    bootBtn.innerHTML = `<span class="w-2 h-2 rounded-full bg-black/70"></span> Boot Sandbox`;
+  }
 });
 
 templateSelect.addEventListener("change", async () => {
