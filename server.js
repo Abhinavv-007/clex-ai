@@ -87,7 +87,7 @@ async function requireFirebaseAuth(req, res, next) {
 // to enable SharedArrayBuffer. We set these only for the playground page.
 app.get('/playground.html', (req, res, next) => {
     res.set('Cross-Origin-Opener-Policy', 'same-origin');
-    res.set('Cross-Origin-Embedder-Policy', 'credentialless');
+    res.set('Cross-Origin-Embedder-Policy', 'require-corp');
     next();
 });
 app.use(express.static(path.join(__dirname)));
