@@ -1079,9 +1079,19 @@
       // --- Render Marquee ---
       const marqueeContainer = document.getElementById("marquee-container");
       let marqueeHTML = "";
-      const duplicatedModels = [...aiModels, ...aiModels];
+      const marqueeItems = [
+        { spacer: true, widthClass: "w-24 md:w-40 lg:w-80" },
+        ...aiModels,
+        { spacer: true, widthClass: "w-24 md:w-40 lg:w-80" },
+      ];
+      const duplicatedModels = [...marqueeItems, ...marqueeItems];
 
       duplicatedModels.forEach((model) => {
+        if (model.spacer) {
+          marqueeHTML += `<div aria-hidden="true" class="flex-shrink-0 ${model.widthClass}"></div>`;
+          return;
+        }
+
         const providerLabel = model.providerName || model.provider;
         const logo = getProviderLogo(providerLabel);
         const shortName = model.name.split("/")[1] || model.name;

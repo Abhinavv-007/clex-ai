@@ -157,9 +157,10 @@ textarea:focus-visible,
 }
 
 .animate-marquee {
-    animation: marquee 140s linear infinite;
+    animation: marquee 220s linear infinite;
     display: flex;
     width: max-content;
+    will-change: transform;
 }
 
 .animate-marquee:hover {
