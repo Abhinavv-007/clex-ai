@@ -211,6 +211,20 @@
 <span class="tok-comment"># Your CLEX API key (set as environment variable)</span>
 <span class="tok-key">CLEX_API_KEY</span>=<span class="tok-str">"clex_xxxxxxxxxxxxxxxxxxxx"</span></code></pre>
               </div>
+              <p class="mt-3 text-xs text-gray-500 leading-relaxed">
+                <span class="text-cyan-300 font-semibold">Note:</span>
+                <code class="inline-code">https://api.clex.in/v1</code> is the
+                API base URL for your SDK or HTTP client. It is not a browser
+                page.
+                <a
+                  href="https://api.clex.in"
+                  target="_blank"
+                  rel="noreferrer"
+                  class="text-cyan-400 hover:text-cyan-300 underline"
+                  >Open the dashboard</a
+                >
+                to create keys and manage access.
+              </p>
 
               <h3
                 class="text-lg font-medium text-white mb-6 mt-10 flex items-center gap-3"
@@ -238,6 +252,13 @@
     ]
   }'</span></code></pre>
               </div>
+              <p class="mt-3 text-xs text-gray-500 leading-relaxed">
+                <span class="text-cyan-300 font-semibold">Important:</span>
+                <code class="inline-code">/v1/chat/completions</code> expects a
+                <code class="inline-code">POST</code> request with JSON. If you
+                open it directly in a browser tab, it will not behave like a
+                web page.
+              </p>
 
               <h3
                 class="text-lg font-medium text-white mb-6 mt-10 flex items-center gap-3"
@@ -348,6 +369,19 @@
               In this docs page, the API Explorer uses local
               <code class="inline-code">/api/chat</code> as a proxy for
               <code class="inline-code">https://api.clex.in/v1/chat/completions</code>.
+            </p>
+            <p class="text-xs text-gray-500 mt-2">
+              Use
+              <code class="inline-code">https://api.clex.in/v1/chat/completions</code>
+              from code, cURL, Postman, or the OpenAI SDK. For browser
+              navigation and API keys, go to
+              <a
+                href="https://api.clex.in"
+                target="_blank"
+                rel="noreferrer"
+                class="text-cyan-400 hover:text-cyan-300 underline"
+                >api.clex.in</a
+              >.
             </p>
           </section>
 
