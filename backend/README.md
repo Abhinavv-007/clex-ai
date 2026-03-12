@@ -2,6 +2,8 @@
 
 Production backend for `api.clex.in`.
 
+Vercel deploys this project from the `backend/` directory. The Vercel entrypoint is [index.js](/Users/abhinav/Desktop/clex/backend/index.js), which forwards to the compiled Express app in `dist/index.js`.
+
 ## Endpoints
 
 | Method | Path | Auth | Description |
