@@ -160,6 +160,9 @@
             <a href="#rate-limits">Rate Limits</a>
             <a href="#tutorials">Tutorials & Guides</a>
             <a href="#changelog">API Changelog</a>
+            <div class="mt-6 pt-4 border-t border-white/5">
+              <a href="https://api.clex.in/dashboard" target="_blank" class="text-cyan-400 text-xs font-bold uppercase tracking-wider hover:text-cyan-300 flex items-center gap-1.5 px-1">Dashboard &rarr;</a>
+            </div>
           </nav>
         </aside>
 
@@ -881,9 +884,10 @@ Explain quantum computing in 2 sentences.</textarea
               </div>
               <pre><code>{
   <span class="tok-key">"error"</span>: {
-    <span class="tok-key">"code"</span>: <span class="tok-str">"invalid_request_error"</span>,
-    <span class="tok-key">"message"</span>: <span class="tok-str">"Model 'meta/llama-nonexistent' does not exist."</span>,
-    <span class="tok-key">"param"</span>: <span class="tok-str">"model"</span>
+    <span class="tok-key">"message"</span>: <span class="tok-str">"Model 'meta/llama-nonexistent' is not available. Check /v1/models for supported models."</span>,
+    <span class="tok-key">"type"</span>: <span class="tok-str">"upstream_error"</span>,
+    <span class="tok-key">"code"</span>: <span class="tok-str">"provider_error"</span>,
+    <span class="tok-key">"status"</span>: <span class="tok-num">404</span>
   }
 }</code></pre>
             </div>

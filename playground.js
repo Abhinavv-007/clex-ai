@@ -12,18 +12,24 @@ const $ = (id) => document.getElementById(id);
 // Tabs
 const tabBuilder = $("tab-builder");
 const tabLLM = $("tab-llm");
+const tabAIAssist = $("tab-ai-assist");
 const builderView = $("builder-view");
 const llmView = $("llm-view");
+const aiAssistView = $("ai-assist-view");
+
+const allTabs = [tabBuilder, tabLLM, tabAIAssist];
+const allViews = { builder: builderView, llm: llmView, "ai-assist": aiAssistView };
 
 function setTab(tab) {
-  const isBuilder = tab === "builder";
-  tabBuilder.classList.toggle("active", isBuilder);
-  tabLLM.classList.toggle("active", !isBuilder);
-  builderView.classList.toggle("hidden", !isBuilder);
-  llmView.classList.toggle("hidden", isBuilder);
+  allTabs.forEach((t) => t.classList.remove("active"));
+  Object.values(allViews).forEach((v) => { if (v) v.classList.add("hidden"); });
+  if (tab === "builder") { tabBuilder.classList.add("active"); builderView.classList.remove("hidden"); }
+  else if (tab === "llm") { tabLLM.classList.add("active"); llmView.classList.remove("hidden"); }
+  else if (tab === "ai-assist" && aiAssistView) { tabAIAssist.classList.add("active"); aiAssistView.classList.remove("hidden"); }
 }
 tabBuilder.addEventListener("click", () => setTab("builder"));
 tabLLM.addEventListener("click", () => setTab("llm"));
+if (tabAIAssist) tabAIAssist.addEventListener("click", () => setTab("ai-assist"));
 
 // Simple auth indicator (matches existing site behavior)
 (() => {
@@ -155,6 +161,37 @@ code { color:#67e8f9; }
     },
     entry: "src/App.jsx",
   },
+  vue: {
+    files: {
+      "package.json": JSON.stringify({ name: "clex-vue", private: true, version: "0.0.0", type: "module", scripts: { dev: "vite --host 0.0.0.0 --port 5173" }, dependencies: { vue: "^3.5.0" }, devDependencies: { vite: "^6.0.0", "@vitejs/plugin-vue": "^5.2.0" } }, null, 2),
+      "vite.config.js": `import { defineConfig } from 'vite'\nimport vue from '@vitejs/plugin-vue'\nexport default defineConfig({ plugins: [vue()] })\n`,
+      "index.html": `<!doctype html>\n<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1.0" /><title>Vue</title></head><body><div id="app"></div><script type="module" src="/src/main.js"></script></body></html>\n`,
+      "src/main.js": `import { createApp } from 'vue'\nimport App from './App.vue'\ncreateApp(App).mount('#app')\n`,
+      "src/App.vue": `<template>\n  <div class="app">\n    <h1>Vue Template</h1>\n    <p>Edit <code>src/App.vue</code> and see live updates.</p>\n    <button @click="count++">Count: {{ count }}</button>\n  </div>\n</template>\n<script setup>\nimport { ref } from 'vue'\nconst count = ref(0)\n</script>\n<style>\n:root { color-scheme: dark; }\nbody { margin:0; font-family: system-ui; background:#02050f; color:#e5e7eb; }\n.app { max-width:960px; margin:0 auto; padding:32px; }\nbutton { background:rgba(34,211,238,.15); color:#22d3ee; border:1px solid rgba(34,211,238,.35); padding:10px 14px; border-radius:12px; cursor:pointer; }\ncode { color:#67e8f9; }\n</style>\n`,
+    },
+    entry: "src/App.vue",
+  },
+  svelte: {
+    files: {
+      "package.json": JSON.stringify({ name: "clex-svelte", private: true, version: "0.0.0", type: "module", scripts: { dev: "vite --host 0.0.0.0 --port 5173" }, devDependencies: { vite: "^6.0.0", "@sveltejs/vite-plugin-svelte": "^4.0.0", svelte: "^4.2.0" } }, null, 2),
+      "vite.config.js": `import { defineConfig } from 'vite'\nimport { svelte } from '@sveltejs/vite-plugin-svelte'\nexport default defineConfig({ plugins: [svelte()] })\n`,
+      "index.html": `<!doctype html>\n<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1.0" /><title>Svelte</title></head><body><div id="app"></div><script type="module" src="/src/main.js"></script></body></html>\n`,
+      "src/main.js": `import App from './App.svelte'\nconst app = new App({ target: document.getElementById('app') })\nexport default app\n`,
+      "src/App.svelte": `<script>\n  let count = 0\n</script>\n<main class="app">\n  <h1>Svelte Template</h1>\n  <p>Edit <code>src/App.svelte</code> and see live updates.</p>\n  <button on:click={() => count++}>Count: {count}</button>\n</main>\n<style>\n  :global(body) { margin:0; font-family:system-ui; background:#02050f; color:#e5e7eb; }\n  .app { max-width:960px; margin:0 auto; padding:32px; }\n  button { background:rgba(34,211,238,.15); color:#22d3ee; border:1px solid rgba(34,211,238,.35); padding:10px 14px; border-radius:12px; cursor:pointer; }\n  code { color:#67e8f9; }\n</style>\n`,
+    },
+    entry: "src/App.svelte",
+  },
+  typescript: {
+    files: {
+      "package.json": JSON.stringify({ name: "clex-ts", private: true, version: "0.0.0", type: "module", scripts: { dev: "vite --host 0.0.0.0 --port 5173" }, devDependencies: { vite: "^6.0.0", typescript: "^5.7.0" } }, null, 2),
+      "vite.config.js": `import { defineConfig } from 'vite'\nexport default defineConfig({})\n`,
+      "index.html": `<!doctype html>\n<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1.0" /><title>TypeScript</title><link rel="stylesheet" href="/src/style.css" /></head><body><div id="app"></div><script type="module" src="/src/main.ts"></script></body></html>\n`,
+      "src/main.ts": `const app = document.getElementById('app')!\n\ninterface Counter {\n  count: number\n  increment(): void\n}\n\nconst counter: Counter = {\n  count: 0,\n  increment() { this.count++; render(); }\n}\n\nfunction render() {\n  app.innerHTML = \`\n    <div class="app">\n      <h1>TypeScript Template</h1>\n      <p>Edit <code>src/main.ts</code> with full type safety.</p>\n      <button id="btn">Count: \${counter.count}</button>\n    </div>\n  \`\n  document.getElementById('btn')?.addEventListener('click', () => counter.increment())\n}\nrender()\n`,
+      "src/style.css": `:root { color-scheme: dark; }\nbody { margin:0; font-family:system-ui; background:#02050f; color:#e5e7eb; }\n.app { max-width:960px; margin:0 auto; padding:32px; }\nbutton { background:rgba(34,211,238,.15); color:#22d3ee; border:1px solid rgba(34,211,238,.35); padding:10px 14px; border-radius:12px; cursor:pointer; }\ncode { color:#67e8f9; }\n`,
+      "tsconfig.json": JSON.stringify({ compilerOptions: { target: "ES2022", module: "ESNext", strict: true } }, null, 2),
+    },
+    entry: "src/main.ts",
+  },
 };
 
 // -----------------------------------------------------------------------------
@@ -184,10 +221,16 @@ function log(line) {
   logsEl.scrollTop = logsEl.scrollHeight;
 }
 
+const newFileBtn = $("new-file-btn");
+const delFileBtn = $("del-file-btn");
+let fileList = [];
+
 function setButtons({ booted }) {
   installBtn.disabled = !booted;
   runBtn.disabled = !booted;
   saveBtn.disabled = !booted || !activePath;
+  if (newFileBtn) newFileBtn.disabled = !booted;
+  if (delFileBtn) delFileBtn.disabled = !booted || !activePath;
 }
 
 function detectLang(path) {
@@ -247,13 +290,27 @@ async function mountTemplate(templateKey) {
   previewUrlEl.textContent = "Preview URL: (not running)";
 }
 
+function getFileIcon(path) {
+  if (path.endsWith('.html')) return '🌐';
+  if (path.endsWith('.css')) return '🎨';
+  if (path.endsWith('.js') || path.endsWith('.jsx')) return '⚡';
+  if (path.endsWith('.ts') || path.endsWith('.tsx')) return '🔷';
+  if (path.endsWith('.vue')) return '💚';
+  if (path.endsWith('.svelte')) return '🔶';
+  if (path.endsWith('.json')) return '📋';
+  return '📄';
+}
+
 function renderFileTree(paths) {
   fileTree.innerHTML = "";
+  fileList = paths;
   for (const p of paths) {
     const btn = document.createElement("button");
-    btn.className =
-      "text-left px-3 py-2 rounded-lg border border-white/5 bg-white/0 hover:bg-white/5 hover:border-cyan-500/30 transition-all text-gray-200";
-    btn.textContent = p;
+    const isActive = p === activePath;
+    btn.className = `text-left px-3 py-2 rounded-lg border transition-all flex items-center gap-2 ${
+      isActive ? 'border-cyan-500/40 bg-cyan-500/8 text-cyan-300' : 'border-white/5 bg-white/0 hover:bg-white/5 hover:border-cyan-500/30 text-gray-200'
+    }`;
+    btn.innerHTML = `<span class="text-xs">${getFileIcon(p)}</span><span class="truncate">${p}</span>`;
     btn.addEventListener("click", () => openFile(p));
     fileTree.appendChild(btn);
   }
@@ -352,6 +409,72 @@ runBtn.addEventListener("click", async () => {
 });
 
 saveBtn.addEventListener("click", saveFile);
+
+// Keyboard shortcut: Cmd+S / Ctrl+S to save
+document.addEventListener("keydown", (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key === "s") {
+    e.preventDefault();
+    saveFile();
+  }
+});
+
+// New file button
+if (newFileBtn) {
+  newFileBtn.addEventListener("click", async () => {
+    if (!wc) return;
+    const name = prompt("Enter file name (e.g. utils.js, components/Header.jsx):");
+    if (!name || !name.trim()) return;
+    const filePath = name.trim();
+    try {
+      await wc.fs.writeFile(filePath, "");
+      fileList.push(filePath);
+      renderFileTree(fileList.sort());
+      await openFile(filePath);
+      log(`[created] ${filePath}`);
+    } catch (err) {
+      log(`[error] Could not create ${filePath}: ${err.message}`);
+    }
+  });
+}
+
+// Delete file button
+if (delFileBtn) {
+  delFileBtn.addEventListener("click", async () => {
+    if (!wc || !activePath) return;
+    if (!confirm(`Delete ${activePath}?`)) return;
+    try {
+      await wc.fs.rm(activePath);
+      fileList = fileList.filter((f) => f !== activePath);
+      log(`[deleted] ${activePath}`);
+      activePath = null;
+      renderFileTree(fileList.sort());
+      if (fileList.length > 0) await openFile(fileList[0]);
+      else { setEditorDoc("", null); activeFileLabel.textContent = "Editor"; }
+    } catch (err) {
+      log(`[error] Could not delete ${activePath}: ${err.message}`);
+    }
+  });
+}
+
+// Refresh preview
+const refreshPreviewBtn = $("refresh-preview");
+if (refreshPreviewBtn) {
+  refreshPreviewBtn.addEventListener("click", () => {
+    if (previewFrame.src && previewFrame.src !== "about:blank") {
+      previewFrame.src = previewFrame.src;
+    }
+  });
+}
+
+// Open preview in new tab
+const openPreviewTabBtn = $("open-preview-tab");
+if (openPreviewTabBtn) {
+  openPreviewTabBtn.addEventListener("click", () => {
+    if (previewFrame.src && previewFrame.src !== "about:blank") {
+      window.open(previewFrame.src, "_blank");
+    }
+  });
+}
 
 clearLogsBtn.addEventListener("click", () => {
   logsEl.textContent = "";
@@ -544,3 +667,114 @@ runCompareBtn.addEventListener("click", async () => {
 populateProviderFilter();
 refreshModelOptions();
 updateRunEnabled();
+
+// -----------------------------------------------------------------------------
+// AI Code Assist
+// -----------------------------------------------------------------------------
+const aiChatInput = $("ai-chat-input");
+const aiChatSend = $("ai-chat-send");
+const aiChatMessages = $("ai-chat-messages");
+const aiOutput = $("ai-output");
+const aiCopyOutput = $("ai-copy-output");
+
+function enableAISend() {
+  if (aiChatSend) aiChatSend.disabled = !(aiChatInput?.value?.trim());
+}
+if (aiChatInput) aiChatInput.addEventListener("input", enableAISend);
+if (aiChatInput) aiChatInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !aiChatSend.disabled) sendAIMessage();
+});
+if (aiChatSend) aiChatSend.addEventListener("click", sendAIMessage);
+
+// Quick suggest buttons
+document.querySelectorAll(".ai-suggest-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    if (aiChatInput) {
+      aiChatInput.value = btn.dataset.prompt || "";
+      enableAISend();
+      sendAIMessage();
+    }
+  });
+});
+
+async function sendAIMessage() {
+  const prompt = aiChatInput?.value?.trim();
+  if (!prompt) return;
+
+  // Add user message to chat
+  const userMsg = document.createElement("div");
+  userMsg.className = "bg-white/5 border border-white/8 rounded-xl px-4 py-2 text-sm text-white";
+  userMsg.textContent = prompt;
+  aiChatMessages?.appendChild(userMsg);
+  aiChatInput.value = "";
+  enableAISend();
+
+  // Get current editor context
+  let codeContext = "";
+  if (editorView && activePath) {
+    codeContext = `\n\nCurrent file (${activePath}):\n\`\`\`\n${editorView.state.doc.toString().slice(0, 2000)}\n\`\`\``;
+  }
+
+  const systemPrompt = `You are a helpful coding assistant for a web development playground. The user is building a web project. Respond with code when asked. Be concise.${codeContext}`;
+
+  if (aiOutput) aiOutput.textContent = "Generating...";
+
+  try {
+    const headers = { "Content-Type": "application/json" };
+    const clexKey = $("clex-api-key")?.value?.trim();
+    if (clexKey) headers["x-clex-api-key"] = clexKey;
+
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        model: "meta/llama-3.3-70b-instruct",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: prompt },
+        ],
+        stream: true,
+      }),
+    });
+
+    if (!res.ok) {
+      aiOutput.textContent = `Error: ${await res.text()}`;
+      return;
+    }
+
+    let acc = "";
+    aiOutput.textContent = "";
+    if (window.clex?.streamChatCompletionsSSE) {
+      await window.clex.streamChatCompletionsSSE(res, {
+        onToken: (token) => {
+          acc += token;
+          aiOutput.textContent = acc;
+        },
+      });
+    } else {
+      const data = await res.json();
+      acc = data?.choices?.[0]?.message?.content || JSON.stringify(data);
+      aiOutput.textContent = acc;
+    }
+
+    // Add AI response to chat
+    const aiMsg = document.createElement("div");
+    aiMsg.className = "bg-cyan-500/5 border border-cyan-500/15 rounded-xl px-4 py-2 text-sm text-gray-300";
+    aiMsg.textContent = acc.slice(0, 200) + (acc.length > 200 ? "..." : "");
+    aiChatMessages?.appendChild(aiMsg);
+    aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
+  } catch (err) {
+    if (aiOutput) aiOutput.textContent = `Error: ${err.message}`;
+  }
+}
+
+// Copy AI output
+if (aiCopyOutput) {
+  aiCopyOutput.addEventListener("click", () => {
+    if (aiOutput?.textContent) {
+      navigator.clipboard.writeText(aiOutput.textContent);
+      aiCopyOutput.textContent = "Copied!";
+      setTimeout(() => { aiCopyOutput.textContent = "Copy"; }, 1500);
+    }
+  });
+}
