@@ -47,6 +47,36 @@ export class ProviderError extends AppError {
   }
 }
 
+type ConfigurationErrorDetails = {
+  missingEnvironmentVariables?: string[];
+  fieldErrors?: Record<string, string[]>;
+};
+
+export class ConfigurationError extends AppError {
+  public details?: ConfigurationErrorDetails;
+
+  constructor(message = 'Service is misconfigured', details?: ConfigurationErrorDetails) {
+    super(message, 503, 'service_misconfigured', 'configuration_error');
+    this.details = details;
+  }
+
+  toJSON() {
+    const base = super.toJSON();
+
+    return {
+      error: {
+        ...base.error,
+        ...(this.details?.missingEnvironmentVariables?.length
+          ? { missing_environment_variables: this.details.missingEnvironmentVariables }
+          : {}),
+        ...(this.details?.fieldErrors && Object.keys(this.details.fieldErrors).length
+          ? { field_errors: this.details.fieldErrors }
+          : {}),
+      },
+    };
+  }
+}
+
 export class NotFoundError extends AppError {
   constructor(message = 'Resource not found') {
     super(message, 404, 'not_found', 'not_found_error');

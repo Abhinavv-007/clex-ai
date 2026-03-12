@@ -8,10 +8,11 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
 
-import { config, allowedOrigins } from './config';
+import { config, allowedOrigins, getConfigurationError } from './config';
 import { logger } from './utils/logger';
 import { requestIdMiddleware } from './middleware/requestId';
 import { errorHandler } from './middleware/errorHandler';
+import { requireConfiguration } from './middleware/requireConfiguration';
 
 import healthRouter from './routes/health';
 import modelsRouter from './routes/models';
@@ -80,25 +81,41 @@ const dashboardPath = path.join(__dirname, '..', 'public', 'dashboard');
 app.use('/dashboard', express.static(dashboardPath));
 
 // ─── API Routes ────────────────────────────────────────
-app.get('/', (_req, res) => {
-  res.json({
-    name: 'CLEX API',
-    version: '1.0.0',
-    docs: 'https://clex.in/docs.html',
-    dashboard: 'https://api.clex.in/dashboard',
-    endpoints: {
-      health: 'GET /v1/health',
-      models: 'GET /v1/models',
-      chat: 'POST /v1/chat/completions',
-      keys: 'GET|POST|DELETE /v1/keys',
-      usage: 'GET /v1/usage',
-      analytics: 'GET /v1/analytics',
+export function getRootResponse() {
+  const configurationError = getConfigurationError();
+
+  return {
+    statusCode: configurationError ? 503 : 200,
+    body: {
+      name: 'CLEX API',
+      version: '1.0.0',
+      status: configurationError ? 'degraded' : 'ok',
+      docs: 'https://clex.in/docs.html',
+      dashboard: 'https://api.clex.in/dashboard',
+      endpoints: {
+        health: 'GET /v1/health',
+        models: 'GET /v1/models',
+        chat: 'POST /v1/chat/completions',
+        keys: 'GET|POST|DELETE /v1/keys',
+        usage: 'GET /v1/usage',
+        analytics: 'GET /v1/analytics',
+      },
+      ...(configurationError ? { error: configurationError.toJSON().error } : {}),
     },
-  });
+  };
+}
+
+app.get('/', (_req, res) => {
+  const response = getRootResponse();
+  res.status(response.statusCode).json(response.body);
 });
 
 app.use('/v1/health', healthRouter);
 app.use('/v1/models', modelsRouter);
+app.use(
+  ['/v1/chat/completions', '/v1/keys', '/v1/usage', '/v1/analytics'],
+  requireConfiguration(['DATABASE_URL']),
+);
 app.use('/v1/chat/completions', chatRouter);
 app.use('/v1/keys', keysRouter);
 app.use('/v1/usage', usageRouter);

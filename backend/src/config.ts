@@ -1,56 +1,91 @@
 import { z } from 'zod';
 import dotenv from 'dotenv';
+import { ConfigurationError } from './utils/errors';
 
 dotenv.config();
 
 const envSchema = z.object({
-  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-  PORT: z.coerce.number().default(4000),
-  LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
+  NODE_ENV: z.enum(['development', 'production', 'test']).catch('development').default('development'),
+  PORT: z.coerce.number().int().positive().catch(4000).default(4000),
+  LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).catch('info').default('info'),
 
-  DATABASE_URL: z.string().min(1),
+  DATABASE_URL: z.string().trim().catch('').default(''),
 
-  JWT_SECRET: z.string().min(8).default('dev-secret-change-me'),
-  FIREBASE_SERVICE_ACCOUNT_JSON: z.string().optional(),
+  JWT_SECRET: z.string().min(8).catch('dev-secret-change-me').default('dev-secret-change-me'),
+  FIREBASE_SERVICE_ACCOUNT_JSON: z.string().trim().optional().catch(undefined),
 
-  OPENAI_API_KEY: z.string().optional(),
-  ANTHROPIC_API_KEY: z.string().optional(),
-  GOOGLE_API_KEY: z.string().optional(),
-  NVIDIA_API_KEY: z.string().optional(),
+  OPENAI_API_KEY: z.string().trim().optional().catch(undefined),
+  ANTHROPIC_API_KEY: z.string().trim().optional().catch(undefined),
+  GOOGLE_API_KEY: z.string().trim().optional().catch(undefined),
+  NVIDIA_API_KEY: z.string().trim().optional().catch(undefined),
 
-  RATE_LIMIT_WINDOW_MS: z.coerce.number().default(60_000),
-  RATE_LIMIT_MAX_REQUESTS: z.coerce.number().default(120),
+  RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().catch(60_000).default(60_000),
+  RATE_LIMIT_MAX_REQUESTS: z.coerce.number().int().positive().catch(120).default(120),
 
-  ALLOWED_ORIGINS: z.string().default('https://clex.in,https://www.clex.in,https://api.clex.in,http://localhost:3000,http://localhost:5173'),
+  ALLOWED_ORIGINS: z.string().catch('https://clex.in,https://www.clex.in,https://api.clex.in,http://localhost:3000,http://localhost:5173').default('https://clex.in,https://www.clex.in,https://api.clex.in,http://localhost:3000,http://localhost:5173'),
 
-  PROVIDER_TIMEOUT_MS: z.coerce.number().default(60_000),
+  PROVIDER_TIMEOUT_MS: z.coerce.number().int().positive().catch(60_000).default(60_000),
 });
 
-const parsed = envSchema.safeParse(process.env);
+export const config = envSchema.parse(process.env);
 
-if (!parsed.success) {
-  if (process.env.NODE_ENV !== 'test' && !process.env.VITEST) {
-    console.error('❌ Invalid environment variables:');
-    console.error(parsed.error.flatten().fieldErrors);
-    process.exit(1);
+export const requiredEnvironmentVariables = ['DATABASE_URL'] as const;
+
+export type ConfigKey = keyof typeof config;
+type RequiredEnvironmentVariable = typeof requiredEnvironmentVariables[number];
+
+const requiredEnvironmentMessages: Record<RequiredEnvironmentVariable, string> = {
+  DATABASE_URL: 'DATABASE_URL is required.',
+};
+
+function isConfiguredValue(value: unknown): boolean {
+  if (typeof value === 'string') {
+    return value.trim().length > 0;
   }
+
+  return value !== undefined && value !== null;
 }
 
-export const config = parsed.success ? parsed.data : {
-  NODE_ENV: 'test' as const,
-  PORT: 4000,
-  LOG_LEVEL: 'info' as const,
-  DATABASE_URL: 'postgresql://localhost:5432/clex_test',
-  JWT_SECRET: 'test-secret',
-  FIREBASE_SERVICE_ACCOUNT_JSON: undefined,
-  OPENAI_API_KEY: undefined,
-  ANTHROPIC_API_KEY: undefined,
-  GOOGLE_API_KEY: undefined,
-  NVIDIA_API_KEY: undefined,
-  RATE_LIMIT_WINDOW_MS: 60000,
-  RATE_LIMIT_MAX_REQUESTS: 120,
-  ALLOWED_ORIGINS: 'http://localhost:3000,http://localhost:5173',
-  PROVIDER_TIMEOUT_MS: 60000,
-};
+export function getConfigurationIssues(
+  keys: readonly ConfigKey[] = requiredEnvironmentVariables,
+) {
+  const missingEnvironmentVariables = keys.filter((key) => !isConfiguredValue(config[key]));
+  const fieldErrors = Object.fromEntries(
+    missingEnvironmentVariables.map((key) => [
+      key,
+      [requiredEnvironmentMessages[key as RequiredEnvironmentVariable] || `${String(key)} is required.`],
+    ]),
+  ) as Record<string, string[]>;
+
+  return {
+    isValid: missingEnvironmentVariables.length === 0,
+    missingEnvironmentVariables,
+    fieldErrors,
+  };
+}
+
+export function getConfigurationError(
+  keys: readonly ConfigKey[] = requiredEnvironmentVariables,
+): ConfigurationError | null {
+  const issues = getConfigurationIssues(keys);
+  if (issues.isValid) {
+    return null;
+  }
+
+  return new ConfigurationError(
+    'Required environment variables are missing or invalid. Configure them in the deployment environment and redeploy.',
+    {
+      missingEnvironmentVariables: issues.missingEnvironmentVariables.map(String),
+      fieldErrors: issues.fieldErrors,
+    },
+  );
+}
+
+const startupConfigurationError = getConfigurationError();
+
+if (startupConfigurationError && process.env.NODE_ENV !== 'test' && !process.env.VITEST) {
+  console.error('Invalid environment configuration:');
+  console.error(startupConfigurationError.toJSON().error);
+}
 
 export const allowedOrigins = config.ALLOWED_ORIGINS.split(',').map(s => s.trim()).filter(Boolean);
