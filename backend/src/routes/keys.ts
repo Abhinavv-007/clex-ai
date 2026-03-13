@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
-import { nanoid } from 'nanoid';
+import { v4 as uuidv4 } from 'uuid';
 import { prisma } from '../utils/db';
 import { firebaseAuth } from '../middleware/auth';
 import { AppError, NotFoundError, ValidationError } from '../utils/errors';
@@ -31,7 +31,7 @@ router.post('/', async (req: Request, res: Response) => {
   }
 
   try {
-    const rawKey = `clex_${nanoid(40)}`;
+    const rawKey = `clex_${(uuidv4() + uuidv4()).replace(/-/g, '').slice(0, 40)}`;
     const keyHash = await bcrypt.hash(rawKey, 12);
     const keyPrefix = rawKey.slice(0, 12);
 
