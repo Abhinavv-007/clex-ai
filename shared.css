@@ -283,8 +283,8 @@ textarea:focus-visible,
     font-size: 0.8rem;
     font-weight: 500;
     color: var(--color-text-secondary);
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid var(--color-border);
+    background: transparent;
+    border: 1px solid transparent;
     cursor: pointer;
     transition: all var(--transition-normal);
     white-space: nowrap;
@@ -293,16 +293,16 @@ textarea:focus-visible,
 
 .category-tab:hover {
     color: var(--color-text);
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.15);
-    transform: translateY(-1px);
+    background: transparent;
+    border-color: transparent;
+    transform: none;
 }
 
 .category-tab.active {
     color: #fff;
-    background: rgba(201, 169, 110, 0.1);
-    border-color: rgba(201, 169, 110, 0.4);
-    box-shadow: 0 0 20px rgba(201, 169, 110, 0.08);
+    background: transparent;
+    border-color: rgba(201, 169, 110, 0.6);
+    box-shadow: none;
 }
 
 /* ── Model Cards ── */

@@ -316,11 +316,11 @@ function initParticleWave() {
           green = Math.round(169 + mouseInfluence * 50);
           blue = Math.round(110 + mouseInfluence * 20);
         } else {
-          // Subtle cool white/gray
-          const brightness = 80 + normalizedZ * 60;
+          // Brighter cool white/gray
+          const brightness = 140 + normalizedZ * 80;
           red = Math.round(brightness);
           green = Math.round(brightness);
-          blue = Math.round(brightness + 10);
+          blue = Math.round(brightness + 15);
         }
 
         ctx.beginPath();
