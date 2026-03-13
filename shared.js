@@ -1,5 +1,6 @@
 /* ============================================================================
-   CLEX.IN - SHARED JAVASCRIPT
+   CLEX.IN – SHARED JAVASCRIPT v3.0
+   Cinematic Premium AI Platform
    ========================================================================== */
 
 const CLEX_NAV_ITEMS = [
@@ -49,40 +50,40 @@ function renderAuthActions(options) {
   const dashboardHref = options.dashboardHref || "";
 
   if (!showAuth) {
-    return `<a href="${ctaHref}" class="bg-white/10 border border-white/20 text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-white hover:text-black transition-all no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400">${ctaLabel}</a>`;
+    return `<a href="${ctaHref}" class="text-sm font-medium text-[#888] hover:text-white transition-colors no-underline">${ctaLabel}</a>`;
   }
 
   if (isLoggedIn) {
     return `
-      <div class="hidden sm:flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1 text-xs text-gray-300">
-        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+      <div class="hidden sm:flex items-center gap-2 bg-white/[0.03] border border-white/[0.06] rounded-full px-3 py-1 text-xs text-[#888]">
+        <span class="w-1.5 h-1.5 rounded-full bg-[#c9a96e]"></span>
         <span>Signed in</span>
       </div>
       ${
         dashboardHref
-          ? `<a href="${dashboardHref}" class="text-sm font-medium text-gray-300 hover:text-white transition-colors no-underline">Dashboard</a>`
+          ? `<a href="${dashboardHref}" class="text-sm font-medium text-[#888] hover:text-white transition-colors no-underline">Dashboard</a>`
           : ""
       }
-      <button type="button" data-clex-signout class="text-sm font-medium text-gray-300 hover:text-white transition-colors">Sign Out</button>
-      <a href="${ctaHref}" class="bg-white/10 border border-white/20 text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-white hover:text-black transition-all no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400">${ctaLabel}</a>
+      <button type="button" data-clex-signout class="text-sm font-medium text-[#888] hover:text-white transition-colors">Sign Out</button>
+      <a href="${ctaHref}" class="text-sm font-medium px-5 py-2 rounded-full bg-white/[0.06] border border-white/[0.08] text-white hover:bg-white/[0.1] hover:border-white/[0.15] transition-all no-underline">${ctaLabel}</a>
     `;
   }
 
   return `
-    <a href="login.html" class="text-sm font-medium text-gray-400 hover:text-white transition-colors hidden sm:block no-underline">Sign In</a>
-    <a href="${ctaHref}" class="bg-white/10 border border-white/20 text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-white hover:text-black transition-all no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400">${ctaLabel}</a>
+    <a href="login.html" class="text-sm font-medium text-[#888] hover:text-white transition-colors hidden sm:block no-underline">Sign In</a>
+    <a href="${ctaHref}" class="text-sm font-medium px-5 py-2 rounded-full bg-white/[0.06] border border-white/[0.08] text-white hover:bg-white/[0.1] hover:border-white/[0.15] transition-all no-underline">${ctaLabel}</a>
   `;
 }
 
 function renderHeader(pageKey, options = {}) {
   return `
-    <header id="main-header" class="fixed top-0 w-full z-50 transition-all duration-300 py-6">
-      <div class="max-w-[1600px] mx-auto px-6 md:px-12 lg:px-20 flex items-center justify-between">
-        <a href="index.html" class="flex items-center gap-1.5 cursor-pointer no-underline">
-          <span class="text-xl font-bold tracking-widest text-white">CLEX</span>
-          <div class="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.8)] animate-pulse"></div>
+    <header id="main-header" class="fixed top-0 w-full z-50 transition-all duration-500 py-5">
+      <div class="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-16 flex items-center justify-between">
+        <a href="index.html" class="flex items-center gap-2 cursor-pointer no-underline group">
+          <span class="text-lg font-bold tracking-[0.25em] text-white uppercase" style="font-family:'Inter',sans-serif">CLEX</span>
+          <div class="w-1.5 h-1.5 rounded-full bg-[#c9a96e] shadow-[0_0_8px_rgba(201,169,110,0.6)] group-hover:shadow-[0_0_14px_rgba(201,169,110,0.9)] transition-shadow"></div>
         </a>
-        <nav class="absolute left-1/2 -translate-x-1/2 hidden md:flex items-center gap-1 bg-white/5 border border-white/10 rounded-full p-1 backdrop-blur-md">
+        <nav class="absolute left-1/2 -translate-x-1/2 hidden md:flex items-center gap-0.5 bg-white/[0.03] border border-white/[0.06] rounded-full p-1 backdrop-blur-xl">
           ${renderNavLinks(pageKey)}
         </nav>
         <div class="flex items-center gap-4">
@@ -95,16 +96,19 @@ function renderHeader(pageKey, options = {}) {
 
 function renderFooter() {
   return `
-    <footer class="w-full py-8 border-t border-white/10 bg-[#02050f]/80 backdrop-blur-md z-20 mt-auto relative">
-      <div class="max-w-[1600px] mx-auto px-6 md:px-12 lg:px-20 flex flex-wrap justify-center md:justify-between items-center gap-6 text-sm text-gray-400">
-        <div class="flex items-center gap-2">
-          <div class="w-2 h-2 rounded-full bg-white/20"></div>
-          <span id="copyright-year"></span> clex.in. All rights reserved.
-        </div>
-        <div class="flex flex-wrap justify-center items-center gap-6 font-medium">
-          <a href="support.html" class="hover:text-cyan-300 transition-colors">Support</a>
-          <a href="privacy.html" class="hover:text-cyan-300 transition-colors">Privacy Policy</a>
-          <a href="terms.html" class="hover:text-cyan-300 transition-colors">Terms of Service</a>
+    <footer class="w-full py-10 border-t border-white/[0.04] bg-[#050505]/90 backdrop-blur-md z-20 mt-auto relative">
+      <div class="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-16">
+        <div class="flex flex-wrap justify-center md:justify-between items-center gap-6 text-sm text-[#555]">
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-bold tracking-[0.25em] text-[#888] uppercase">CLEX</span>
+            <span class="text-[#333]">·</span>
+            <span id="copyright-year"></span> clex.in
+          </div>
+          <div class="flex flex-wrap justify-center items-center gap-8 text-xs tracking-wide uppercase font-medium">
+            <a href="support.html" class="hover:text-[#c9a96e] transition-colors no-underline">Support</a>
+            <a href="privacy.html" class="hover:text-[#c9a96e] transition-colors no-underline">Privacy</a>
+            <a href="terms.html" class="hover:text-[#c9a96e] transition-colors no-underline">Terms</a>
+          </div>
         </div>
       </div>
     </footer>
@@ -185,20 +189,20 @@ function initHeaderScrollEffect() {
     if (window.scrollY > 50) {
       header.classList.remove("py-8");
       header.classList.add(
-        "bg-[#02050f]/80",
-        "backdrop-blur-md",
+        "bg-[#050505]/85",
+        "backdrop-blur-xl",
         "border-b",
-        "border-white/10",
-        "py-4",
+        "border-white/[0.04]",
+        "py-3",
       );
     } else {
       header.classList.add("py-8");
       header.classList.remove(
-        "bg-[#02050f]/80",
-        "backdrop-blur-md",
+        "bg-[#050505]/85",
+        "backdrop-blur-xl",
         "border-b",
-        "border-white/10",
-        "py-4",
+        "border-white/[0.04]",
+        "py-3",
       );
     }
   };
@@ -207,97 +211,138 @@ function initHeaderScrollEffect() {
   onScroll();
 }
 
-// --- ASCII Canvas Particle Effect ---
-function initAsciiCanvas() {
-  const canvas = document.getElementById("ascii-canvas");
+// ═══════════════════════════════════════════════════
+// 3D DOTTED PARTICLE WAVE – Cursor Responsive
+// ═══════════════════════════════════════════════════
+function initParticleWave() {
+  const canvas = document.getElementById("particle-canvas");
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
-  const chars = ["0", "1", "{", "}", "/", "<", ">", "*", "A", "I"];
-  const fontSize = 14;
+  if (!ctx) return;
 
-  const resize = () => {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  };
+  let width, height, cols, rows;
+  const spacing = 28;
+  const dotRadius = 1.2;
+  let mouseX = -9999, mouseY = -9999;
+  let time = 0;
+  let animId;
+  const isMobile = /Mobi|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
+
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    canvas.style.width = width + "px";
+    canvas.style.height = height + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cols = Math.ceil(width / spacing) + 2;
+    rows = Math.ceil(height / spacing) + 2;
+  }
+
+  function handleMouse(e) {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  }
+
+  function handleTouch(e) {
+    if (e.touches.length > 0) {
+      mouseX = e.touches[0].clientX;
+      mouseY = e.touches[0].clientY;
+    }
+  }
+
+  function handleMouseLeave() {
+    mouseX = -9999;
+    mouseY = -9999;
+  }
+
   window.addEventListener("resize", resize);
+  document.addEventListener("mousemove", handleMouse);
+  document.addEventListener("touchmove", handleTouch, { passive: true });
+  document.addEventListener("mouseleave", handleMouseLeave);
   resize();
 
-  const noise = (x, y, t) => {
-    return (
-      Math.sin(x * 0.08 + t) * Math.cos(y * 0.08 + t * 0.8) +
-      Math.sin(y * 0.12 - t * 0.4) * Math.cos(x * 0.12 + t * 0.5)
-    );
-  };
+  function render() {
+    time += isMobile ? 0.008 : 0.012;
+    ctx.clearRect(0, 0, width, height);
 
-  const render = (time) => {
-    const t = time * 0.0005;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.font = `bold ${fontSize}px monospace`;
-    ctx.textBaseline = "middle";
-    ctx.textAlign = "center";
+    const effectiveCols = isMobile ? Math.ceil(cols * 0.7) : cols;
+    const effectiveRows = isMobile ? Math.ceil(rows * 0.7) : rows;
+    const effectiveSpacing = isMobile ? spacing * 1.4 : spacing;
 
-    const cols = Math.floor(canvas.width / fontSize);
-    const rows = Math.floor(canvas.height / fontSize);
-    const cx = canvas.width * 0.7;
-    const cy = canvas.height * 0.5;
+    for (let i = 0; i < effectiveCols; i++) {
+      for (let j = 0; j < effectiveRows; j++) {
+        const baseX = i * effectiveSpacing;
+        const baseY = j * effectiveSpacing;
 
-    for (let i = 0; i < cols; i++) {
-      for (let j = 0; j < rows; j++) {
-        const x = i * fontSize + fontSize / 2;
-        const y = j * fontSize + fontSize / 2;
-        const dx = x - cx;
-        const dy = y - cy;
-        const headDist = Math.hypot(dx, (dy + canvas.height * 0.15) * 1.2);
-        const torsoDist = Math.hypot(dx * 0.8, dy - canvas.height * 0.15);
+        // 3D wave displacement
+        const wave1 = Math.sin(baseX * 0.008 + time * 1.2) * 12;
+        const wave2 = Math.cos(baseY * 0.006 + time * 0.8) * 10;
+        const wave3 = Math.sin((baseX + baseY) * 0.005 + time * 0.6) * 8;
+        const waveZ = wave1 + wave2 + wave3;
 
-        let baseIntensity = 0;
-        if (headDist < 140) baseIntensity = 1 - headDist / 140;
-        else if (torsoDist < 280 && dy > -canvas.height * 0.1)
-          baseIntensity = 1 - torsoDist / 280;
+        // Perspective projection
+        const perspective = 800;
+        const scale = perspective / (perspective + waveZ * 2);
+        const x = baseX + (baseX - width / 2) * (scale - 1) * 0.3;
+        const y = baseY + (baseY - height / 2) * (scale - 1) * 0.3 + waveZ * 0.5;
 
-        const n = noise(i * 0.5, j * 0.5, t);
-        let intensity = baseIntensity + n * 0.35;
+        // Mouse interaction
+        const dx = x - mouseX;
+        const dy = y - mouseY;
+        const mouseDist = Math.sqrt(dx * dx + dy * dy);
+        const mouseRadius = isMobile ? 120 : 180;
+        const mouseInfluence = Math.max(0, 1 - mouseDist / mouseRadius);
 
-        if (intensity <= 0) {
-          const auraNoise = noise(i * 0.1, j * 0.1, t * 0.3);
-          if (auraNoise > 0.6) intensity = (auraNoise - 0.6) * 0.3;
+        // Base opacity from wave height
+        const normalizedZ = (waveZ + 30) / 60;
+        let alpha = 0.08 + normalizedZ * 0.2;
+
+        // Brighter near cursor
+        alpha += mouseInfluence * 0.5;
+        alpha = Math.min(alpha, 0.7);
+
+        // Size variation
+        let r = dotRadius * scale;
+        r += mouseInfluence * 2;
+
+        // Color: warm gold tint near cursor, cool white-gray far away
+        let red, green, blue;
+        if (mouseInfluence > 0.01) {
+          // Gold/amber near cursor
+          red = Math.round(201 + mouseInfluence * 54);
+          green = Math.round(169 + mouseInfluence * 50);
+          blue = Math.round(110 + mouseInfluence * 20);
+        } else {
+          // Subtle cool white/gray
+          const brightness = 80 + normalizedZ * 60;
+          red = Math.round(brightness);
+          green = Math.round(brightness);
+          blue = Math.round(brightness + 10);
         }
 
-        if (intensity > 0.05) {
-          const charNoise = noise(i * 0.3, j * 0.3, 0);
-          const charIdx = Math.floor(Math.abs(charNoise * 20)) % chars.length;
-          const char = chars[charIdx];
-          const colorNoise = noise(i * 0.1, j * 0.1, t * 0.2);
-          let r, g, b;
-
-          if (intensity > 0.8 || colorNoise > 0.7) {
-            r = 230;
-            g = 255;
-            b = 100;
-          } else if (intensity > 0.5 || colorNoise > 0.3) {
-            r = 80;
-            g = 240;
-            b = 150;
-          } else if (intensity > 0.2) {
-            r = 40;
-            g = 180;
-            b = 255;
-          } else {
-            r = 20;
-            g = 80;
-            b = 180;
-          }
-
-          const twinkle = (Math.sin(t * 5 + i * 0.2 + j * 0.2) + 1) * 0.5;
-          const alpha = Math.min(1, intensity * (0.4 + twinkle * 0.6));
-          ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
-          ctx.fillText(char, x, y);
-        }
+        ctx.beginPath();
+        ctx.arc(x, y, Math.max(0.3, r), 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${red},${green},${blue},${alpha})`;
+        ctx.fill();
       }
     }
-    requestAnimationFrame(render);
-  };
-  render(0);
+
+    animId = requestAnimationFrame(render);
+  }
+
+  render();
+
+  // Cleanup on page hide
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      cancelAnimationFrame(animId);
+    } else {
+      render();
+    }
+  });
 }
 
 // --- Provider Logo Generator ---
@@ -364,7 +409,7 @@ function getProviderLogo(provider) {
 
 // --- Featured Card Mouse Tracking ---
 function initFeaturedCards() {
-  document.querySelectorAll(".featured-card").forEach((card) => {
+  document.querySelectorAll(".featured-card, .glass-card").forEach((card) => {
     card.addEventListener("mousemove", (e) => {
       const rect = card.getBoundingClientRect();
       card.style.setProperty(
@@ -377,6 +422,14 @@ function initFeaturedCards() {
       );
     });
   });
+}
+
+// --- Inject noise overlay ---
+function injectNoiseOverlay() {
+  if (document.querySelector('.noise-overlay')) return;
+  const div = document.createElement('div');
+  div.className = 'noise-overlay';
+  document.body.appendChild(div);
 }
 
 // --- Streaming SSE helper (OpenAI-style chunks) ---
@@ -442,6 +495,7 @@ document.addEventListener("DOMContentLoaded", () => {
   bindAuthActions();
   initFeaturedCards();
   initHeaderScrollEffect();
+  injectNoiseOverlay();
 });
 
-window.addEventListener("load", initAsciiCanvas);
+window.addEventListener("load", initParticleWave);

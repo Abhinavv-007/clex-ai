@@ -4,9 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Support & Community - Clex.in</title>
-  <meta name="description"
-    content="Get help with your CLEX API integration. Contact support, read FAQs, or join our community." />
+  <title>Support — CLEX</title>
+  <meta name="description" content="Get help with your CLEX API integration. Contact support, read FAQs, or join our community." />
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="shared.css" />
 
@@ -19,23 +18,18 @@
   <script defer src="/_vercel/insights/script.js"></script>
 </head>
 
-<body class="min-h-screen relative grid-bg">
-  <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-    <div class="orb w-[40vw] h-[40vw] bg-purple-900/10 top-[20%] right-[20%]" style="filter: blur(140px)"></div>
-    <div class="orb w-[30vw] h-[30vw] bg-cyan-900/10 bottom-[10%] left-[10%]" style="filter: blur(100px)"></div>
-  </div>
-  <canvas id="ascii-canvas" class="fixed inset-0 z-0 pointer-events-none"></canvas>
+<body class="min-h-screen relative">
+  <canvas id="particle-canvas"></canvas>
 
   <div class="relative z-10 flex flex-col min-h-screen">
     <div data-clex-header data-page="support"></div>
 
     <main class="flex-1 flex flex-col max-w-[1200px] mx-auto w-full px-6 md:px-12 lg:px-20 pt-40 pb-24 z-10">
       <div class="text-center mb-16">
-        <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 tracking-tight">
-          How can we
-          <span class="text-purple-400 text-shadow-[0_0_20px_rgba(168,85,247,0.4)]">help?</span>
+        <h1 class="text-4xl md:text-5xl lg:text-6xl text-white mb-6 display-serif">
+          How can we <span class="display-serif-italic" style="color:#c9a96e">help?</span>
         </h1>
-        <p class="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
+        <p class="text-[#888] text-lg max-w-2xl mx-auto leading-relaxed">
           Search through our frequently asked questions, join the developer
           community, or get in touch below.
         </p>
@@ -44,33 +38,31 @@
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
         <!-- FAQ Section -->
         <div class="lg:col-span-7 space-y-4">
-          <h2 class="text-2xl font-bold text-white mb-6">
-            Frequently Asked Questions
-          </h2>
+          <h2 class="text-2xl text-white mb-6 display-serif">Frequently Asked Questions</h2>
 
           <details
-            class="group bg-white/5 border border-white/10 rounded-2xl open:bg-white/[0.07] transition-all duration-300">
+            class="group bg-white/[0.02] border border-white/[0.06] rounded-2xl open:bg-white/[0.04] transition-all duration-300">
             <summary
-              class="flex justify-between items-center font-semibold cursor-pointer p-6 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 rounded-2xl">
+              class="flex justify-between items-center font-semibold cursor-pointer p-6 text-white focus:outline-none rounded-2xl">
               How do I switch from raw OpenAI to CLEX?
               <span
-                class="text-purple-400 group-open:rotate-45 transition-transform duration-300 text-2xl leading-none">+</span>
+                class="text-[#c9a96e] group-open:rotate-45 transition-transform duration-300 text-2xl leading-none">+</span>
             </summary>
             <div class="text-sm text-gray-400 px-6 pb-6 leading-relaxed">
               It's as simple as swapping the base URL to
-              <code class="text-purple-300">https://api.clex.in/v1</code> and
+              <code class="text-[#c9a96e]">https://api.clex.in/v1</code> and
               passing in your CLEX API key. All endpoints are 100% compatible
               with the standard OpenAI SDK format.
             </div>
           </details>
 
           <details
-            class="group bg-white/5 border border-white/10 rounded-2xl open:bg-white/[0.07] transition-all duration-300">
+            class="group bg-white/[0.02] border border-white/[0.06] rounded-2xl open:bg-white/[0.04] transition-all duration-300">
             <summary
-              class="flex justify-between items-center font-semibold cursor-pointer p-6 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 rounded-2xl">
+              class="flex justify-between items-center font-semibold cursor-pointer p-6 text-white focus:outline-none rounded-2xl">
               Will you have access to my user data or prompts?
               <span
-                class="text-purple-400 group-open:rotate-45 transition-transform duration-300 text-2xl leading-none">+</span>
+                class="text-[#c9a96e] group-open:rotate-45 transition-transform duration-300 text-2xl leading-none">+</span>
             </summary>
             <div class="text-sm text-gray-400 px-6 pb-6 leading-relaxed">
               We are zero-retention by default for prompt/response content in
@@ -80,12 +72,12 @@
           </details>
 
           <details
-            class="group bg-white/5 border border-white/10 rounded-2xl open:bg-white/[0.07] transition-all duration-300">
+            class="group bg-white/[0.02] border border-white/[0.06] rounded-2xl open:bg-white/[0.04] transition-all duration-300">
             <summary
-              class="flex justify-between items-center font-semibold cursor-pointer p-6 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 rounded-2xl">
+              class="flex justify-between items-center font-semibold cursor-pointer p-6 text-white focus:outline-none rounded-2xl">
               What happens if a model drops offline?
               <span
-                class="text-purple-400 group-open:rotate-45 transition-transform duration-300 text-2xl leading-none">+</span>
+                class="text-[#c9a96e] group-open:rotate-45 transition-transform duration-300 text-2xl leading-none">+</span>
             </summary>
             <div class="text-sm text-gray-400 px-6 pb-6 leading-relaxed">
               Our unified API automatically routes your request to a fallback
@@ -96,24 +88,24 @@
           </details>
 
           <details
-            class="group bg-white/5 border border-white/10 rounded-2xl open:bg-white/[0.07] transition-all duration-300">
+            class="group bg-white/[0.02] border border-white/[0.06] rounded-2xl open:bg-white/[0.04] transition-all duration-300">
             <summary
-              class="flex justify-between items-center font-semibold cursor-pointer p-6 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 rounded-2xl">
+              class="flex justify-between items-center font-semibold cursor-pointer p-6 text-white focus:outline-none rounded-2xl">
               Can I get custom rate limits for production workloads?
               <span
-                class="text-purple-400 group-open:rotate-45 transition-transform duration-300 text-2xl leading-none">+</span>
+                class="text-[#c9a96e] group-open:rotate-45 transition-transform duration-300 text-2xl leading-none">+</span>
             </summary>
             <div class="text-sm text-gray-400 px-6 pb-6 leading-relaxed">
               Yes. Please reach out to
               <a href="mailto:support@abhnv.in"
-                class="text-purple-400 hover:text-purple-300 underline">support@abhnv.in</a>
+                class="text-[#c9a96e] hover:text-[#e0c9a0] underline">support@abhnv.in</a>
               with your expected TPS (Tokens per Second) and concurrency
               requirements. We can provision dedicated VPC endpoints.
             </div>
           </details>
 
           <div
-            class="mt-8 p-6 bg-purple-500/10 border border-purple-500/20 rounded-2xl flex items-center justify-between group">
+            class="mt-8 p-6 bg-[#c9a96e]/5 border border-[#c9a96e]/10 rounded-2xl flex items-center justify-between group">
             <div>
               <h3 class="text-white font-semibold mb-1">Community</h3>
               <p class="text-xs text-gray-400">
@@ -128,9 +120,9 @@
 
         <!-- Contact Form -->
         <div class="lg:col-span-5">
-          <div class="glass-card rounded-3xl p-8 sticky top-32 border border-white/10">
-            <h2 class="text-2xl font-bold text-white mb-2">Contact Us</h2>
-            <p class="text-gray-400 text-sm mb-6">
+          <div class="glass-card rounded-3xl p-8 sticky top-32 border border-white/[0.06]">
+            <h2 class="text-2xl text-white mb-2 display-serif">Contact Us</h2>
+            <p class="text-[#888] text-sm mb-6">
               Send us a message directly from here.
             </p>
 
@@ -139,25 +131,25 @@
                 <label for="name"
                   class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Name</label>
                 <input type="text" id="name" required
-                  class="w-full bg-[#02050f]/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-purple-500/50 transition-colors"
+                  class="w-full bg-[#050505]/50 border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#c9a96e]/30 transition-colors"
                   placeholder="Abhinav Raj" />
               </div>
               <div>
                 <label for="email" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Email
                   address</label>
                 <input type="email" id="email" required
-                  class="w-full bg-[#02050f]/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-purple-500/50 transition-colors"
+                  class="w-full bg-[#050505]/50 border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#c9a96e]/30 transition-colors"
                   placeholder="abhinav@clex.in" />
               </div>
               <div>
                 <label for="message"
                   class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Message</label>
                 <textarea id="message" rows="4" required
-                  class="w-full bg-[#02050f]/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-purple-500/50 transition-colors resize-none"
+                  class="w-full bg-[#050505]/50 border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#c9a96e]/30 transition-colors resize-none"
                   placeholder="I have a question about..."></textarea>
               </div>
               <button type="submit"
-                class="w-full bg-white text-black font-bold py-3.5 px-4 rounded-xl transition-all hover:bg-gray-200 mt-2 hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+                class="w-full bg-[#c9a96e] text-black font-bold py-3.5 px-4 rounded-xl transition-all hover:bg-[#d4b87a] mt-2 hover:shadow-[0_0_20px_rgba(201,169,110,0.3)]">
                 Send Message
               </button>
             </form>

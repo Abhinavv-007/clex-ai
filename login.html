@@ -3,11 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sign In - Clex.in</title>
-    <meta
-      name="description"
-      content="Sign in to CLEX to access multiple AI models through a unified API."
-    />
+    <title>Sign In — CLEX</title>
+    <meta name="description" content="Sign in to CLEX to access every AI model through one unified API." />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="shared.css" />
 
@@ -20,28 +17,9 @@
     <script defer src="/_vercel/insights/script.js"></script>
   </head>
 
-  <body class="min-h-screen relative grid-bg">
-    <!-- Background Ambient Glows -->
-    <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-      <div
-        class="orb w-[35vw] h-[35vw] bg-cyan-900/15 top-[10%] left-[15%]"
-        style="filter: blur(120px)"
-      ></div>
-      <div
-        class="orb w-[30vw] h-[30vw] bg-emerald-900/10 bottom-[10%] right-[15%]"
-        style="filter: blur(140px)"
-      ></div>
-      <div
-        class="orb w-[20vw] h-[20vw] bg-purple-900/10 top-[60%] left-[50%]"
-        style="filter: blur(100px)"
-      ></div>
-    </div>
-
-    <canvas
-      id="ascii-canvas"
-      class="fixed inset-0 z-0 pointer-events-none"
-      style="opacity: 0.4"
-    ></canvas>
+  <body class="min-h-screen relative">
+    <!-- 3D Particle Wave Background -->
+    <canvas id="particle-canvas"></canvas>
 
     <div class="relative z-10 flex flex-col min-h-screen">
       <div
@@ -56,41 +34,23 @@
         <div class="w-full max-w-[440px]">
         <!-- Logo -->
         <div class="text-center mb-10">
-          <a
-            href="index.html"
-            class="inline-flex items-center gap-2 no-underline mb-6"
-          >
-            <span class="text-3xl font-bold tracking-widest text-white"
-              >CLEX</span
-            >
-            <div
-              class="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.8)] animate-pulse"
-            ></div>
+          <a href="index.html" class="inline-flex items-center gap-2 no-underline mb-6">
+            <span class="text-2xl font-bold tracking-[0.25em] text-white uppercase breathe">CLEX</span>
+            <div class="w-1.5 h-1.5 rounded-full bg-[#c9a96e] gold-pulse"></div>
           </a>
-          <p class="text-gray-500 text-sm mt-2">
-            Access <span data-model-count-label>multiple AI models</span> through
-            one API
+          <p class="text-[#555] text-sm mt-2">
+            Access <span data-model-count-label>every AI model</span> through one API
           </p>
         </div>
 
         <!-- Login Card -->
         <div class="login-card">
           <!-- Tabs: Sign In / Sign Up -->
-          <div
-            class="flex gap-1 bg-white/3 rounded-xl p-1 mb-8 border border-white/5"
-          >
-            <button
-              id="tab-signin"
-              onclick="switchTab('signin')"
-              class="flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all bg-white/8 text-white"
-            >
+          <div class="flex gap-1 bg-white/[0.02] rounded-xl p-1 mb-8 border border-white/[0.04]">
+            <button id="tab-signin" onclick="switchTab('signin')" class="flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all bg-white/[0.06] text-white">
               Sign In
             </button>
-            <button
-              id="tab-signup"
-              onclick="switchTab('signup')"
-              class="flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all text-gray-500 hover:text-gray-300"
-            >
+            <button id="tab-signup" onclick="switchTab('signup')" class="flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all text-[#555] hover:text-[#888]">
               Sign Up
             </button>
           </div>
@@ -144,14 +104,14 @@
               <label class="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
-                  class="w-3.5 h-3.5 rounded border-white/20 bg-transparent accent-cyan-400"
+                  class="w-3.5 h-3.5 rounded border-white/20 bg-transparent accent-[#c9a96e]"
                 />
-                <span class="text-xs text-gray-500">Remember me</span>
+                <span class="text-xs text-[#555]">Remember me</span>
               </label>
               <a
                 href="login.html#reset"
                 onclick="resetPassword(event)"
-                class="text-xs text-cyan-400/70 hover:text-cyan-400 transition-colors"
+                class="text-xs text-[#c9a96e]/70 hover:text-[#c9a96e] transition-colors"
                 >Forgot password?</a
               >
             </div>
@@ -163,9 +123,7 @@
                 <div class="w-full border-t border-white/6"></div>
               </div>
               <div class="relative flex justify-center text-xs">
-                <span class="bg-[#080c18] px-3 text-gray-600"
-                  >or continue with</span
-                >
+                <span class="bg-[#0a0a0a] px-3 text-[#333]">or continue with</span>
               </div>
             </div>
 
@@ -174,7 +132,7 @@
               <button
                 type="button"
                 onclick="signInWithGithub()"
-                class="flex items-center justify-center gap-2 bg-white/3 border border-white/6 rounded-lg py-2.5 text-gray-400 hover:text-white hover:bg-white/6 hover:border-white/15 transition-all text-sm"
+                class="flex items-center justify-center gap-2 bg-white/[0.02] border border-white/[0.06] rounded-lg py-2.5 text-[#888] hover:text-white hover:bg-white/[0.04] hover:border-white/[0.1] transition-all text-sm"
               >
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                   <path
@@ -186,7 +144,7 @@
               <button
                 type="button"
                 onclick="signInWithGoogle()"
-                class="flex items-center justify-center gap-2 bg-white/3 border border-white/6 rounded-lg py-2.5 text-gray-400 hover:text-white hover:bg-white/6 hover:border-white/15 transition-all text-sm"
+                class="flex items-center justify-center gap-2 bg-white/[0.02] border border-white/[0.06] rounded-lg py-2.5 text-[#888] hover:text-white hover:bg-white/[0.04] hover:border-white/[0.1] transition-all text-sm"
               >
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                   <path
@@ -281,17 +239,12 @@
             <div class="flex items-center gap-2 mb-6">
               <input
                 type="checkbox"
-                class="w-3.5 h-3.5 rounded border-white/20 bg-transparent accent-cyan-400"
+                class="w-3.5 h-3.5 rounded border-white/20 bg-transparent accent-[#c9a96e]"
                 required
               />
-              <span class="text-xs text-gray-500"
-                >I agree to the
-                <a
-                  href="terms.html"
-                  class="text-cyan-400/70 hover:text-cyan-400"
-                  >Terms of Service</a
-                ></span
-              >
+              <span class="text-xs text-[#555]">I agree to the
+                <a href="terms.html" class="text-[#c9a96e]/70 hover:text-[#c9a96e]">Terms of Service</a>
+              </span>
             </div>
 
             <button type="submit" class="login-btn">Create Account</button>
@@ -301,9 +254,7 @@
                 <div class="w-full border-t border-white/6"></div>
               </div>
               <div class="relative flex justify-center text-xs">
-                <span class="bg-[#080c18] px-3 text-gray-600"
-                  >or continue with</span
-                >
+                <span class="bg-[#0a0a0a] px-3 text-[#333]">or continue with</span>
               </div>
             </div>
 
@@ -311,7 +262,7 @@
               <button
                 type="button"
                 onclick="signInWithGithub()"
-                class="flex items-center justify-center gap-2 bg-white/3 border border-white/6 rounded-lg py-2.5 text-gray-400 hover:text-white hover:bg-white/6 hover:border-white/15 transition-all text-sm"
+                class="flex items-center justify-center gap-2 bg-white/[0.02] border border-white/[0.06] rounded-lg py-2.5 text-[#888] hover:text-white hover:bg-white/[0.04] hover:border-white/[0.1] transition-all text-sm"
               >
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                   <path
@@ -323,7 +274,7 @@
               <button
                 type="button"
                 onclick="signInWithGoogle()"
-                class="flex items-center justify-center gap-2 bg-white/3 border border-white/6 rounded-lg py-2.5 text-gray-400 hover:text-white hover:bg-white/6 hover:border-white/15 transition-all text-sm"
+                class="flex items-center justify-center gap-2 bg-white/[0.02] border border-white/[0.06] rounded-lg py-2.5 text-[#888] hover:text-white hover:bg-white/[0.04] hover:border-white/[0.1] transition-all text-sm"
               >
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                   <path
@@ -351,19 +302,11 @@
 
         <!-- Bottom Links -->
         <div class="text-center mt-8">
-          <p class="text-xs text-gray-600">
+          <p class="text-xs text-[#333]">
             By signing in, you agree to our
-              <a
-                href="terms.html"
-                class="text-gray-500 hover:text-gray-300 transition-colors"
-                >Terms</a
-              >
-              &
-              <a
-                href="privacy.html"
-                class="text-gray-500 hover:text-gray-300 transition-colors"
-                >Privacy Policy</a
-              >
+            <a href="terms.html" class="text-[#555] hover:text-[#888] transition-colors">Terms</a>
+            &
+            <a href="privacy.html" class="text-[#555] hover:text-[#888] transition-colors">Privacy Policy</a>
           </p>
         </div>
         </div>
@@ -416,17 +359,17 @@
         const signupForm = document.getElementById("form-signup");
 
         if (tab === "signin") {
-          signinTab.classList.add("bg-white/8", "text-white");
-          signinTab.classList.remove("text-gray-500");
-          signupTab.classList.remove("bg-white/8", "text-white");
-          signupTab.classList.add("text-gray-500");
+          signinTab.classList.add("bg-white/[0.06]", "text-white");
+          signinTab.classList.remove("text-[#555]");
+          signupTab.classList.remove("bg-white/[0.06]", "text-white");
+          signupTab.classList.add("text-[#555]");
           signinForm.classList.remove("hidden");
           signupForm.classList.add("hidden");
         } else {
-          signupTab.classList.add("bg-white/8", "text-white");
-          signupTab.classList.remove("text-gray-500");
-          signinTab.classList.remove("bg-white/8", "text-white");
-          signinTab.classList.add("text-gray-500");
+          signupTab.classList.add("bg-white/[0.06]", "text-white");
+          signupTab.classList.remove("text-[#555]");
+          signinTab.classList.remove("bg-white/[0.06]", "text-white");
+          signinTab.classList.add("text-[#555]");
           signupForm.classList.remove("hidden");
           signinForm.classList.add("hidden");
         }

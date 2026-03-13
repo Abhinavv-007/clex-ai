@@ -3,11 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Models - Clex.in | AI Model Catalog</title>
-    <meta
-      name="description"
-      content="Browse AI models available through CLEX. Text, code, speech, safety, embedding, and vision models in one unified catalog."
-    />
+    <title>Models — CLEX</title>
+    <meta name="description" content="Browse AI models available through CLEX. Text, code, speech, safety, embedding, and vision models in one unified catalog." />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="shared.css" />
 
@@ -21,81 +18,30 @@
   </head>
 
   <body class="min-h-screen relative">
-    <!-- Background Ambient Glows -->
-    <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-      <div
-        class="absolute top-1/4 left-1/4 w-[40vw] h-[40vw] bg-cyan-900/20 rounded-full blur-[120px] mix-blend-screen"
-      ></div>
-      <div
-        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[50vw] h-[50vw] bg-emerald-900/10 rounded-full blur-[150px] mix-blend-screen"
-      ></div>
-    </div>
-
-    <canvas
-      id="ascii-canvas"
-      class="fixed inset-0 z-0 pointer-events-none"
-    ></canvas>
+    <canvas id="particle-canvas"></canvas>
 
     <div class="relative z-10 flex flex-col min-h-screen">
       <div data-clex-header data-page="models"></div>
 
       <!-- Hero Banner -->
-      <section
-        class="pt-36 pb-12 max-w-[1600px] mx-auto w-full px-6 md:px-12 lg:px-20"
-      >
-        <div
-          class="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 mb-10"
-        >
+      <section class="pt-36 pb-12 max-w-[1400px] mx-auto w-full px-6 md:px-12 lg:px-16">
+        <div class="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 mb-10">
           <div>
-            <div
-              class="inline-flex items-center gap-2 bg-cyan-500/10 border border-cyan-500/30 rounded-full px-3 py-1 mb-4"
-            >
-              <div
-                class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"
-              ></div>
-              <span
-                class="text-xs text-cyan-300 font-semibold"
-                id="model-count-badge"
-                data-model-count-label
-                >Models</span
-              >
-            </div>
-            <h1
-              class="text-4xl md:text-5xl font-semibold text-white leading-tight"
-            >
-              Model
-              <span
-                class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-emerald-300"
-                >Catalog</span
-              >
+            <p class="label-caps mb-4" id="model-count-badge" data-model-count-label>Models</p>
+            <h1 class="text-4xl md:text-5xl text-white leading-tight display-serif breathe">
+              Model <span class="display-serif-italic" style="color:#c9a96e">Catalog</span>
             </h1>
-            <p class="text-gray-400 text-lg mt-3 max-w-xl">
-              Browse, search, and try every model available through the CLEX
-              unified API.
+            <p class="text-[#888] text-lg mt-3 max-w-xl">
+              Browse, search, and try every model available through the CLEX unified API.
             </p>
           </div>
 
           <!-- Search Bar -->
           <div class="w-full md:w-96 relative">
-            <svg
-              class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
+            <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#555]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            <input
-              id="search-input"
-              type="text"
-              placeholder="Search models, publishers..."
-              class="w-full bg-white/5 border border-white/10 rounded-xl pl-11 pr-4 py-3 text-sm text-white placeholder-gray-500 outline-none focus:border-cyan-500/50 transition-colors backdrop-blur-md"
-            />
+            <input id="search-input" type="text" placeholder="Search models, publishers..." class="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl pl-11 pr-4 py-3 text-sm text-white placeholder-[#555] outline-none focus:border-[#c9a96e]/30 transition-colors backdrop-blur-md" />
           </div>
         </div>
 
@@ -126,19 +72,12 @@
       </section>
 
       <!-- Models Grid -->
-      <section
-        class="flex-1 max-w-[1600px] mx-auto w-full px-6 md:px-12 lg:px-20 pb-20"
-      >
-        <div
-          id="models-grid"
-          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"
-        >
+      <section class="flex-1 max-w-[1400px] mx-auto w-full px-6 md:px-12 lg:px-16 pb-20">
+        <div id="models-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5" style="overflow:visible">
           <!-- Injected by JS -->
         </div>
         <div id="no-results" class="hidden text-center py-20">
-          <p class="text-gray-500 text-lg">
-            No models found matching your search.
-          </p>
+          <p class="text-[#555] text-lg">No models found matching your search.</p>
         </div>
       </section>
 
@@ -154,24 +93,15 @@
 
     <!-- Chat Panel -->
     <div id="chat-panel" class="chat-panel z-[100]">
-      <div
-        class="flex items-center justify-between p-4 border-b border-white/8 bg-[#02050f]/90"
-      >
+      <div class="flex items-center justify-between p-4 border-b border-white/[0.06] bg-[#050505]/90">
         <div class="flex items-center gap-3">
-          <div class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>
+          <div class="w-1.5 h-1.5 rounded-full bg-[#c9a96e] shadow-[0_0_6px_rgba(201,169,110,0.5)]"></div>
           <div>
-            <h3 id="chat-model-name" class="text-sm font-semibold text-white">
-              Model
-            </h3>
-            <p id="chat-model-publisher" class="text-xs text-gray-500">
-              Publisher
-            </p>
+            <h3 id="chat-model-name" class="text-sm font-semibold text-white">Model</h3>
+            <p id="chat-model-publisher" class="text-xs text-[#555]">Publisher</p>
           </div>
         </div>
-        <button
-          onclick="closeChat()"
-          class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-all"
-        >
+        <button onclick="closeChat()" class="w-8 h-8 rounded-lg bg-white/[0.03] border border-white/[0.06] flex items-center justify-center text-[#555] hover:text-white hover:bg-white/[0.06] transition-all">
           <svg
             class="w-4 h-4"
             fill="none"
@@ -188,9 +118,9 @@
         </button>
       </div>
       <div id="chat-messages" class="chat-messages">
-        <div class="text-center text-gray-600 text-sm py-10">
+        <div class="text-center text-[#555] text-sm py-10">
           <p>Send a message to start chatting</p>
-          <p class="text-xs text-gray-700 mt-1">Powered by CLEX API</p>
+          <p class="text-xs text-[#333] mt-1">Powered by CLEX API</p>
         </div>
       </div>
       <div class="chat-input-bar">
@@ -346,39 +276,39 @@
             const meta = getModelMetadata(m);
 
             return `
-            <div class="model-card flex flex-col h-full" data-model="${modelId}" data-provider="${provider}">
+            <div class="model-card flex flex-col h-full" style="cursor:default;overflow:visible" data-model="${modelId}" data-provider="${provider}">
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center gap-2.5">
                         <div class="w-8 h-8 rounded-lg flex items-center justify-center scale-[0.8]" title="${provider}">
                             ${logo.iconHTML}
                         </div>
-                        <span class="text-xs font-medium text-gray-500">${provider}</span>
+                        <span class="text-xs font-medium text-[#555]">${provider}</span>
                     </div>
                     <span class="tag-badge ${tagClass}" title="Model Category: ${catLabel}">${catLabel}</span>
                 </div>
                 <h3 class="text-sm font-semibold text-white mb-1 leading-snug break-all" title="${modelId}">${modelId}</h3>
-                <p class="text-[11px] text-gray-500 mb-2 break-all">${modelLabel}</p>
-                <p class="text-xs text-gray-400 mb-3 leading-relaxed flex-grow">${modelDescription}</p>
+                <p class="text-[11px] text-[#555] mb-2 break-all">${modelLabel}</p>
+                <p class="text-xs text-[#888] mb-3 leading-relaxed flex-grow">${modelDescription}</p>
                 
-                <div class="grid grid-cols-2 gap-2 mt-auto mb-4 text-[10px] text-gray-400">
-                    <div class="flex justify-between items-center bg-white/5 p-1.5 rounded border border-white/5 hover:border-cyan-500/30 transition-colors" title="Parameter scale or model type. Larger values usually indicate more capability, while specialized models may show a task label.">
-                        <span class="text-gray-500 font-medium">Params</span>
+                <div class="grid grid-cols-2 gap-2 mt-auto mb-4 text-[10px]">
+                    <div class="flex justify-between items-center bg-white/[0.02] p-1.5 rounded border border-white/[0.04] hover:border-white/[0.08] transition-colors">
+                        <span class="text-[#555] font-medium">Params</span>
                         <span class="text-white font-mono">${meta.params}</span>
                     </div>
-                    <div class="flex justify-between items-center bg-white/5 p-1.5 rounded border border-white/5 hover:border-cyan-500/30 transition-colors" title="Context Window Limit. Maximum number of tokens the model can process at once.">
-                        <span class="text-gray-500 font-medium">Context</span>
+                    <div class="flex justify-between items-center bg-white/[0.02] p-1.5 rounded border border-white/[0.04] hover:border-white/[0.08] transition-colors">
+                        <span class="text-[#555] font-medium">Context</span>
                         <span class="text-white font-mono">${meta.ctx}</span>
                     </div>
-                    <div class="flex justify-between items-center bg-white/5 p-1.5 rounded border border-white/5 hover:border-cyan-500/30 transition-colors" title="Max Output Tokens. Maximum tokens the model can generate in a single response.">
-                        <span class="text-gray-500 font-medium">Max Out</span>
+                    <div class="flex justify-between items-center bg-white/[0.02] p-1.5 rounded border border-white/[0.04] hover:border-white/[0.08] transition-colors">
+                        <span class="text-[#555] font-medium">Max Out</span>
                         <span class="text-white font-mono">${meta.maxOut}</span>
                     </div>
-                    <div class="flex justify-between items-center bg-white/5 p-1.5 rounded border border-white/5 hover:border-cyan-500/30 transition-colors" title="Approximate billing view used across the site. Token models show input/output per 1M, while speech and other specialized models show unit pricing notes.">
-                        <span class="text-gray-500 font-medium">Cost/1M</span>
-                        <span class="text-emerald-400 font-mono">${meta.price}</span>
+                    <div class="flex justify-between items-center bg-white/[0.02] p-1.5 rounded border border-white/[0.04] hover:border-white/[0.08] transition-colors">
+                        <span class="text-[#555] font-medium">Cost/1M</span>
+                        <span class="text-[#c9a96e] font-mono">${meta.price}</span>
                     </div>
-                    <div class="col-span-2 flex justify-between items-center bg-white/5 p-1.5 rounded border border-white/5 hover:border-cyan-500/30 transition-colors" title="Training Data Cutoff Date.">
-                        <span class="text-gray-500 font-medium">Cutoff</span>
+                    <div class="col-span-2 flex justify-between items-center bg-white/[0.02] p-1.5 rounded border border-white/[0.04] hover:border-white/[0.08] transition-colors">
+                        <span class="text-[#555] font-medium">Cutoff</span>
                         <span class="text-white font-mono">${meta.cutoff}</span>
                     </div>
                 </div>
@@ -386,12 +316,12 @@
                 ${
                   isChat
                     ? `
-                <button class="try-btn w-full bg-white/5 backdrop-blur-md border border-white/10 text-cyan-400 py-2 rounded-lg text-xs font-semibold hover:bg-white/10 hover:border-cyan-400/40 hover:shadow-[0_0_15px_rgba(34,211,238,0.2)] transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                <button class="try-btn w-full bg-white/[0.03] backdrop-blur-md border border-white/[0.06] text-[#c9a96e] py-2 rounded-lg text-xs font-semibold hover:bg-white/[0.06] hover:border-[#c9a96e]/30 hover:shadow-[0_0_15px_rgba(201,169,110,0.1)] transition-all focus:outline-none"
                     onclick="openChat('${modelId}', '${provider}')" aria-label="Try ${modelId}">
-                    ⚡ Try it
+                    Try it
                 </button>`
                     : `
-                <div class="try-btn text-xs text-gray-500 text-center py-2 font-medium bg-white/5 rounded-lg border border-white/5" aria-label="${modelId} is a specialized model">Use specialized endpoint</div>
+                <div class="try-btn text-xs text-[#555] text-center py-2 font-medium bg-white/[0.02] rounded-lg border border-white/[0.04]" aria-label="${modelId} is a specialized model">Use specialized endpoint</div>
                 `
                 }
             </div>
@@ -429,7 +359,7 @@
         document.getElementById("chat-model-publisher").textContent = provider;
         document.getElementById("chat-messages").innerHTML = `
             <div class="text-center text-gray-600 text-sm py-10">
-                <p>Send a message to start chatting with <span class="text-cyan-400 font-medium">${modelId}</span></p>
+                <p>Send a message to start chatting with <span class="text-[#c9a96e] font-medium">${modelId}</span></p>
                 <p class="text-xs text-gray-700 mt-1">Powered by CLEX API</p>
             </div>
         `;
