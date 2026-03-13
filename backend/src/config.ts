@@ -29,12 +29,12 @@ const envSchema = z.object({
 
 export const config = envSchema.parse(process.env);
 
-export const requiredEnvironmentVariables = ['DATABASE_URL'] as const;
+export const requiredEnvironmentVariables = [] as const;
 
 export type ConfigKey = keyof typeof config;
 type RequiredEnvironmentVariable = typeof requiredEnvironmentVariables[number];
 
-const requiredEnvironmentMessages: Record<RequiredEnvironmentVariable, string> = {
+const requiredEnvironmentMessages: Record<string, string> = {
   DATABASE_URL: 'DATABASE_URL is required.',
 };
 

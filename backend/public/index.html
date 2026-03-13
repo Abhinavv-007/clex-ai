@@ -9,9 +9,7 @@
         content="The CLEX unified AI API. Access hundreds of models through one OpenAI-compatible endpoint. View endpoints, check status, and get started in seconds." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;700;900&display=swap"
-        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="icon" type="image/png" href="https://clex.in/favicon.png" />
     
     <!-- Tailwind CSS for layout utility classes like fixed inset-0 -->
@@ -43,18 +41,20 @@
         html {
             scroll-behavior: smooth;
         }
-
         body {
             background-color: var(--bg);
-            color: white;
-            font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
+            color: var(--text-main);
+            font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
             min-height: 100vh;
             background-image:
                 linear-gradient(rgba(255, 255, 255, 0.013) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255, 255, 255, 0.013) 1px, transparent 1px);
             background-size: 60px 60px;
+            background-position: center center;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
         ::selection {
@@ -974,6 +974,8 @@
 <body>
     <!-- Background -->
     <div style="position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden">
+        <!-- 3D Particle Canvas -->
+        <canvas id="particle-canvas" style="position:absolute;inset:0;width:100%;height:100%;z-index:1"></canvas>
         <div class="orb orb-1"></div>
         <div class="orb orb-2"></div>
     </div>
@@ -1448,59 +1450,8 @@ console.log(res.choices[0].message.content);`
         checkStatus();
         loadModelCount();
         setInterval(checkStatus, 30000);
-
-        // ── ASCII Canvas (matches clex.in) ──
-        (function () {
-            const canvas = document.getElementById('ascii-canvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            const chars = ['0', '1', '{', '}', '/', '<', '>', '*', 'A', 'I'];
-            const fontSize = 14;
-
-            function resize() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            }
-            window.addEventListener('resize', resize);
-            resize();
-
-            const noise = (x, y, t) =>
-                Math.sin(x * 0.08 + t) * Math.cos(y * 0.08 + t * 0.8) +
-                Math.sin(y * 0.12 - t * 0.4) * Math.cos(x * 0.12 + t * 0.5);
-
-            function render(time) {
-                const t = time * 0.0005;
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.font = `bold ${fontSize}px monospace`;
-                ctx.textAlign = 'center';
-
-                const cols = Math.floor(canvas.width / fontSize);
-                const rows = Math.floor(canvas.height / fontSize);
-                const cx = canvas.width * 0.75;
-                const cy = canvas.height * 0.5;
-
-                for (let i = 0; i < cols; i++) {
-                    for (let j = 0; j < rows; j++) {
-                        const x = i * fontSize + fontSize / 2;
-                        const y = j * fontSize + fontSize / 2;
-                        const dx = x - cx;
-                        const dy = y - cy;
-                        const dist = Math.hypot(dx, dy);
-                        const n = noise(i * 0.5, j * 0.5, t);
-                        let intensity = (dist < 300 ? 1 - dist / 300 : 0) + n * 0.3;
-                        if (intensity > 0.1) {
-                            const char = chars[Math.floor(Math.abs(n * 10)) % chars.length];
-                            const alpha = Math.min(1, intensity * 0.5);
-                            ctx.fillStyle = `rgba(201,169,110,${alpha})`;
-                            ctx.fillText(char, x, y);
-                        }
-                    }
-                }
-                requestAnimationFrame(render);
-            }
-            requestAnimationFrame(render);
-        })();
     </script>
+    <script src="../shared.js"></script>
 </body>
 
 </html>
