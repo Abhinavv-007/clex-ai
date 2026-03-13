@@ -131,14 +131,10 @@
             -webkit-backdrop-filter: blur(16px);
         }
 
-        .nav-inner {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            height: 64px;
+        /* ── Header overrides for API page ── */
+        header {
+            background: transparent !important;
+            border-bottom: none !important;
         }
 
         .nav-logo {
@@ -209,7 +205,7 @@
 
         /* ── Hero ── */
         .hero {
-            padding: 6rem 0 4rem;
+            padding: 8rem 0 4rem;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -255,9 +251,9 @@
         }
 
         .hero h1 {
-            font-family: 'Outfit', sans-serif;
-            font-size: clamp(2.8rem, 7vw, 5rem);
-            font-weight: 900;
+            font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+            font-size: clamp(3.5rem, 8vw, 6rem);
+            font-weight: 700;
             line-height: 1.05;
             letter-spacing: -0.02em;
             margin-bottom: 1.5rem;
@@ -267,7 +263,8 @@
         .gradient-text {
             color: #c9a96e;
             font-style: italic;
-            font-family: 'Outfit', serif;
+            font-weight: 400;
+            font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
             animation: breathe 4s ease-in-out infinite;
         }
         @keyframes breathe {
@@ -1009,7 +1006,8 @@
             </div>
 
             <h1>
-                The <span class="gradient-text">CLEX</span> API
+                The CLEX <br />
+                <span class="gradient-text">API.</span>
             </h1>
             <p class="hero-sub">
                 One unified, OpenAI-compatible endpoint for hundreds of AI models.
@@ -1336,30 +1334,37 @@ console.log(res.choices[<span class="n">0</span>].message.content);</code></pre>
             const dot = document.getElementById('status-dot');
             const text = document.getElementById('status-text');
             const statStatus = document.getElementById('stat-status');
+            
+            // Default to OK to prevent false degraded from Vercel caching
+            if (dot) dot.className = 'status-dot';
+            if (text) text.textContent = 'All Systems Operational';
+            if (statStatus) statStatus.textContent = 'Healthy';
+
             try {
                 const ctrl = new AbortController();
                 const t = setTimeout(() => ctrl.abort(), 9000);
                 const res = await fetch('/v1/health', { signal: ctrl.signal });
                 clearTimeout(t);
                 const data = await res.json();
+                
                 if (res.ok && data.status === 'ok') {
-                    dot.className = 'status-dot';
-                    text.textContent = 'All Systems Operational';
-                    statStatus.textContent = 'Healthy';
+                    if (dot) dot.className = 'status-dot';
+                    if (text) text.textContent = 'All Systems Operational';
+                    if (statStatus) statStatus.textContent = 'Healthy';
                 } else {
-                    dot.className = 'status-dot degraded';
-                    text.textContent = data.status === 'degraded' ? 'Partially Degraded' : 'Degraded';
-                    statStatus.textContent = 'Degraded';
+                    if (dot) dot.className = 'status-dot degraded';
+                    if (text) text.textContent = data.status === 'degraded' ? 'Partially Degraded' : 'Degraded';
+                    if (statStatus) statStatus.textContent = 'Degraded';
                 }
             } catch (e) {
                 if (e.name === 'AbortError') {
-                    dot.className = 'status-dot degraded';
-                    text.textContent = 'Warming Up… (retry in 30s)';
-                    statStatus.textContent = 'Starting';
+                    if (dot) dot.className = 'status-dot degraded';
+                    if (text) text.textContent = 'Warming Up… (retry in 30s)';
+                    if (statStatus) statStatus.textContent = 'Starting';
                 } else {
-                    dot.className = 'status-dot error';
-                    text.textContent = 'Status Unavailable';
-                    statStatus.textContent = 'Unknown';
+                    if (dot) dot.className = 'status-dot error';
+                    if (text) text.textContent = 'Status Unavailable';
+                    if (statStatus) statStatus.textContent = 'Unknown';
                 }
             }
         }
