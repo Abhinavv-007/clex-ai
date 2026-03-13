@@ -8,9 +8,7 @@
     <meta name="description"
         content="The CLEX unified AI API. Access hundreds of models through one OpenAI-compatible endpoint. View endpoints, check status, and get started in seconds." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="icon" type="image/png" href="https://clex.in/favicon.png" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet" />
     
     <!-- Tailwind CSS for layout utility classes like fixed inset-0 -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -44,12 +42,37 @@
         body {
             background-color: var(--bg);
             color: var(--text-main);
-            font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             line-height: 1.6;
             margin: 0;
             min-height: 100vh;
+            background-image:
+                radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 32px 32px;
+            background-position: 0 0;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Interactive Dot Glow Layer ── */
+        body::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(201, 169, 110, 0.45) 1.5px, transparent 1.5px);
+            background-size: 32px 32px;
+            background-position: 0 0;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 1;
+            /* The mask is updated via JS to follow cursor */
+            -webkit-mask-image: radial-gradient(300px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 100%);
+            mask-image: radial-gradient(300px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 100%);
+        }
+
+        body:hover::before {
+            opacity: 1;
         }
 
         ::selection {
@@ -975,47 +998,65 @@
         <div class="orb orb-2"></div>
     </div>
 
-    <div class="relative z-10 flex flex-col min-h-screen">
-        <div data-clex-header data-page="api"></div>
 
-        <div class="wrap" style="position:relative; z-index:10; max-width:1400px; margin:0 auto;">
-            <!-- Hero -->
-            <main class="flex-1 flex flex-col justify-center w-full px-6 md:px-12 lg:px-16 pt-32 pb-24 cursor-glow-area" style="min-height: 80vh;">
-                <div class="text-center max-w-4xl mx-auto z-10 relative">
-                    <div class="hero-badge">
-                        <div class="status-dot" id="status-dot"></div>
-                        <span id="status-text">Checking status…</span>
-                    </div>
+    <!-- Nav -->
+    <nav>
+        <div class="nav-inner">
+            <a href="https://clex.in" class="nav-logo">
+                <div class="nav-logo-dot"></div>
+                CLEX
+                <span
+                    style="color:var(--text-muted);font-weight:400;font-size:0.85rem;font-family:'JetBrains Mono',monospace">API</span>
+            </a>
+            <div class="nav-links">
+                <a href="https://clex.in/docs.html" class="nav-link">Docs</a>
+                <a href="https://api.clex.in/dashboard" class="nav-link">Dashboard</a>
+                <a href="https://clex.in" class="nav-link btn-ghost btn"
+                    style="padding:0.45rem 1rem;font-size:0.82rem">clex.in ↗</a>
+                <a href="https://clex.in/login.html" class="nav-link cta">Get Started</a>
+            </div>
+        </div>
+    </nav>
 
-                    <h1 class="hero-h1 mb-8" style="animation: fadeUp 0.7s ease-out 0.1s both;">
-                        <span class="display-serif text-[3.5rem] sm:text-[5rem] lg:text-[6.5rem] text-white block leading-[1.05] breathe">The</span>
-                        <span class="display-serif-italic text-[3.5rem] sm:text-[5rem] lg:text-[6.5rem] block leading-[1.05]" style="color:#c9a96e">CLEX API.</span>
-                    </h1>
-                    
-                    <p class="hero-desc text-[#888] text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-10" style="animation: fadeUp 0.7s ease-out 0.2s both;">
-                        One unified, OpenAI-compatible endpoint for hundreds of AI models.<br>
-                        Drop-in replacement for your existing SDK. No vendor lock-in.
-                    </p>
+    <div class="wrap">
+        <!-- Hero -->
+        <div class="hero">
+            <h1 class="hero-h1 mb-6">
+                <span class="display-serif text-[3.5rem] sm:text-[5rem] lg:text-[6.5rem] text-white block leading-[1.05] breathe" style="font-family: 'Newsreader', serif; font-weight: 400; letter-spacing: -0.02em;">Every AI Model.</span>
+                <span class="display-serif-italic text-[3.5rem] sm:text-[5rem] lg:text-[6.5rem] block leading-[1.05]" style="font-family: 'Newsreader', serif; font-style: italic; font-weight: 400; color:#c9a96e; letter-spacing: -0.02em;">One API.</span>
+            </h1>
+            <p class="hero-sub" style="font-size: 1.15rem; max-width: 600px;">
+                Access GPT, Claude, Gemini, Llama, DeepSeek and 130+ models
+                through a single OpenAI-compatible endpoint. One key, one SDK, one bill.
+            </p>
 
-                    <div class="hero-btns flex flex-wrap justify-center gap-4 mb-16" style="animation: fadeUp 0.7s ease-out 0.3s both;">
-                        <a href="https://clex.in/docs.html" class="btn-primary no-underline text-white" style="border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05); padding:0.6rem 1.25rem; border-radius:999px; font-weight:500;">
-                            Read the Docs
-                        </a>
-                        <a href="/dashboard" class="btn-secondary no-underline text-white" style="border:1px solid rgba(255,255,255,0.1); background:transparent; padding:0.6rem 1.25rem; border-radius:999px; font-weight:500;">
-                            Dashboard
-                        </a>
-                        <a href="https://clex.in/login.html" class="btn-primary no-underline" style="background:var(--cyan); color:#000; padding:0.6rem 1.25rem; border-radius:999px; font-weight:600;">
-                            Get API Key →
-                        </a>
-                    </div>
+            <!-- Code Snippet Box inside Hero (matching Piramyd) -->
+            <div class="code-card" style="margin-bottom: 2.5rem; text-align: left; padding: 1.25rem 1.5rem; border-radius: 1rem; border: 1px dashed rgba(201,169,110,0.3); background: rgba(0,0,0,0.6); max-width: 480px; width: 100%;">
+                <code style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #a1a1aa; line-height: 1.6;">
+                    <span style="color:#6366f1">base_url</span> = <span style="color:#c9a96e">"https://api.clex.in/v1"</span><br>
+                    <span style="color:#52525b"># That's it. Use any OpenAI SDK.</span>
+                </code>
+            </div>
 
-                    <div class="base-url-chip mx-auto" onclick="copyBaseUrl(this)" title="Click to copy">
-                        <span style="color:var(--text-muted);font-size:0.72rem;font-family:'Inter',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:0.08em">Base URL</span>
-                        <span class="url">https://api.clex.in/v1</span>
-                        <span class="chip-copy">Copy</span>
-                    </div>
-                </div>
-            </main>
+            <div class="hero-btns flex items-center gap-4 justify-center">
+                <a href="https://clex.in/login.html" class="btn-primary" style="background: linear-gradient(135deg, #c9a96e, #b8944d); color: #050505; border-radius: 9999px; padding: 0.85rem 2.25rem; font-weight: 600; text-decoration: none; border: none; box-shadow: 0 0 20px rgba(201, 169, 110, 0.15);">
+                    Start Free &rsaquo;
+                </a>
+                <a href="https://clex.in/models.html" class="btn-ghost" style="border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 9999px; padding: 0.85rem 2.25rem; font-weight: 500; text-decoration: none; background: transparent;">
+                    View Models
+                </a>
+            </div>
+            
+            <div style="margin-top: 3rem; text-align: center; font-size: 0.65rem; font-weight: 700; color: var(--text-muted); letter-spacing: 0.2em; text-transform: uppercase;">
+                MODELS FROM THE BEST IN AI
+            </div>
+            <div style="display: flex; gap: 2rem; align-items: center; justify-content: center; margin-top: 1.5rem; opacity: 0.5; font-weight: 700; font-size: 1.1rem; flex-wrap: wrap;">
+                <span>OpenAI</span>
+                <span>Anthropic</span>
+                <span>Google</span>
+                <span>Mistral</span>
+                <span>Cohere</span>
+            </div>
         </div>
 
         <!-- Stats -->
@@ -1303,8 +1344,6 @@ console.log(res.choices[<span class="n">0</span>].message.content);</code></pre>
         <p>© 2026 CLEX · <a href="https://clex.in">clex.in</a> · Built for developers</p>
     </footer>
 
-    </div>
-
     <script>
         // ── Live Status ──
         async function checkStatus() {
@@ -1424,6 +1463,14 @@ console.log(res.choices[0].message.content);`
         checkStatus();
         loadModelCount();
         setInterval(checkStatus, 30000);
+
+        // ── Cursor tracking for glowing dots background ──
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth) * 100;
+            const y = (e.clientY / window.innerHeight) * 100;
+            document.body.style.setProperty('--mouse-x', x + '%');
+            document.body.style.setProperty('--mouse-y', y + '%');
+        });
     </script>
     <script src="../shared.js"></script>
 </body>
