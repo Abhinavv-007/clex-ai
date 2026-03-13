@@ -1147,33 +1147,44 @@ console.log(res.choices[<span class="n">0</span>].message.content);</code></pre>
             const text = document.getElementById('status-text');
             const statStatus = document.getElementById('stat-status');
             try {
-                const res = await fetch('/v1/health');
+                const ctrl = new AbortController();
+                const t = setTimeout(() => ctrl.abort(), 9000);
+                const res = await fetch('/v1/health', { signal: ctrl.signal });
+                clearTimeout(t);
                 const data = await res.json();
-                if (res.ok) {
+                if (res.ok && data.status === 'ok') {
                     dot.className = 'status-dot';
                     text.textContent = 'All Systems Operational';
                     statStatus.textContent = 'Healthy';
                 } else {
                     dot.className = 'status-dot degraded';
-                    text.textContent = 'Degraded';
+                    text.textContent = data.status === 'degraded' ? 'Partially Degraded' : 'Degraded';
                     statStatus.textContent = 'Degraded';
                 }
-            } catch {
-                dot.className = 'status-dot error';
-                text.textContent = 'Unreachable';
-                statStatus.textContent = 'Unknown';
+            } catch (e) {
+                if (e.name === 'AbortError') {
+                    dot.className = 'status-dot degraded';
+                    text.textContent = 'Warming Up… (retry in 30s)';
+                    statStatus.textContent = 'Starting';
+                } else {
+                    dot.className = 'status-dot error';
+                    text.textContent = 'Status Unavailable';
+                    statStatus.textContent = 'Unknown';
+                }
             }
         }
 
         // ── Model Count ──
         async function loadModelCount() {
             try {
-                const res = await fetch('/v1/models');
+                const ctrl = new AbortController();
+                const t = setTimeout(() => ctrl.abort(), 9000);
+                const res = await fetch('/v1/models', { signal: ctrl.signal });
+                clearTimeout(t);
+                if (!res.ok) return;
                 const data = await res.json();
                 const count = data?.data?.length || data?.models?.length || 0;
-                if (count > 0) {
-                    animateCount(document.getElementById('stat-models'), count);
-                }
+                if (count > 0) animateCount(document.getElementById('stat-models'), count);
             } catch { }
         }
 
@@ -1248,6 +1259,7 @@ console.log(res.choices[0].message.content);`
         // ── Init ──
         checkStatus();
         loadModelCount();
+        setInterval(checkStatus, 30000);
     </script>
 </body>
 
