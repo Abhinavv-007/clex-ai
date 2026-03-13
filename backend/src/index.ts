@@ -105,7 +105,17 @@ export function getRootResponse() {
   };
 }
 
-app.get('/', (_req, res) => {
+app.get('/', (req, res) => {
+  const acceptsHtml = req.headers.accept?.includes('text/html');
+  const isApiClient = req.headers.accept?.includes('application/json') ||
+    !req.headers.accept ||
+    (req.headers['user-agent']?.includes('curl') ?? false);
+
+  if (acceptsHtml && !isApiClient) {
+    res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+    return;
+  }
+
   const response = getRootResponse();
   res.status(response.statusCode).json(response.body);
 });

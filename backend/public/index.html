@@ -1,0 +1,1254 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CLEX API — Developer Platform</title>
+    <meta name="description"
+        content="The CLEX unified AI API. Access hundreds of models through one OpenAI-compatible endpoint. View endpoints, check status, and get started in seconds." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;700;900&display=swap"
+        rel="stylesheet" />
+    <link rel="icon" type="image/png" href="https://clex.in/favicon.png" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #02050f;
+            --cyan: #22d3ee;
+            --emerald: #34d399;
+            --purple: #a855f7;
+            --border: rgba(255, 255, 255, 0.06);
+            --border-hover: rgba(34, 211, 238, 0.25);
+            --glass: rgba(255, 255, 255, 0.02);
+            --glass-hover: rgba(255, 255, 255, 0.05);
+            --text-muted: #6b7280;
+            --text-mid: #9ca3af;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: white;
+            font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.013) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.013) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        ::selection {
+            background: rgba(34, 211, 238, 0.25);
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 3px;
+        }
+
+        /* ── Orbs ── */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            mix-blend-mode: screen;
+            filter: blur(120px);
+            z-index: 0;
+        }
+
+        .orb-1 {
+            width: 40vw;
+            height: 40vw;
+            background: rgba(6, 108, 130, 0.12);
+            top: 0;
+            left: -5%;
+        }
+
+        .orb-2 {
+            width: 30vw;
+            height: 30vw;
+            background: rgba(16, 85, 60, 0.09);
+            bottom: 10%;
+            right: 0;
+        }
+
+        .orb-3 {
+            width: 20vw;
+            height: 20vw;
+            background: rgba(88, 28, 160, 0.07);
+            top: 40%;
+            left: 55%;
+        }
+
+        /* ── Layout ── */
+        .wrap {
+            position: relative;
+            z-index: 10;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* ── Nav ── */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            border-bottom: 1px solid var(--border);
+            background: rgba(2, 5, 15, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        .nav-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 900;
+            font-size: 1.25rem;
+            text-decoration: none;
+            color: white;
+        }
+
+        .nav-logo-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--cyan);
+            box-shadow: 0 0 8px var(--cyan);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: 0.4
+            }
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-link {
+            padding: 0.45rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            text-decoration: none;
+            color: var(--text-mid);
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .nav-link:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--border);
+        }
+
+        .nav-link.cta {
+            background: linear-gradient(135deg, #ffffff, #e2e8f0);
+            color: #0f172a;
+            font-weight: 600;
+            border: none;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link.cta:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.2);
+        }
+
+        /* ── Hero ── */
+        .hero {
+            padding: 6rem 0 4rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: rgba(34, 211, 238, 0.05);
+            border: 1px solid rgba(34, 211, 238, 0.2);
+            border-radius: 9999px;
+            padding: 0.4rem 1rem;
+            margin-bottom: 2rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: rgba(34, 211, 238, 0.85);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            animation: fadeUp 0.6s ease-out both;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--emerald);
+            box-shadow: 0 0 6px var(--emerald);
+            flex-shrink: 0;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .status-dot.degraded {
+            background: #f59e0b;
+            box-shadow: 0 0 6px #f59e0b;
+        }
+
+        .status-dot.error {
+            background: #ef4444;
+            box-shadow: 0 0 6px #ef4444;
+            animation: none;
+        }
+
+        .hero h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(2.8rem, 7vw, 5rem);
+            font-weight: 900;
+            line-height: 1.05;
+            letter-spacing: -0.02em;
+            margin-bottom: 1.5rem;
+            animation: fadeUp 0.7s ease-out 0.1s both;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #22d3ee, #34d399, #22d3ee);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 5s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 0% 50%
+            }
+
+            50% {
+                background-position: 100% 50%
+            }
+
+            100% {
+                background-position: 0% 50%
+            }
+        }
+
+        .hero-sub {
+            color: var(--text-mid);
+            font-size: 1.05rem;
+            max-width: 560px;
+            line-height: 1.75;
+            margin-bottom: 2.5rem;
+            animation: fadeUp 0.7s ease-out 0.2s both;
+        }
+
+        .hero-btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            justify-content: center;
+            margin-bottom: 3.5rem;
+            animation: fadeUp 0.7s ease-out 0.3s both;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-white {
+            background: linear-gradient(135deg, #fff, #e2e8f0);
+            color: #0f172a;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.12), 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-white:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.22), 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            backdrop-filter: blur(8px);
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--border-hover);
+            background: rgba(34, 211, 238, 0.06);
+            transform: translateY(-2px);
+        }
+
+        .btn-cyan {
+            background: linear-gradient(135deg, rgba(34, 211, 238, 0.15), rgba(52, 211, 153, 0.1));
+            color: var(--cyan);
+            border: 1px solid rgba(34, 211, 238, 0.25);
+        }
+
+        .btn-cyan:hover {
+            background: linear-gradient(135deg, rgba(34, 211, 238, 0.25), rgba(52, 211, 153, 0.15));
+            box-shadow: 0 0 20px rgba(34, 211, 238, 0.15);
+            transform: translateY(-2px);
+        }
+
+        /* ── Base URL chip ── */
+        .base-url-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 0.7rem 1.2rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            color: var(--text-mid);
+            animation: fadeUp 0.7s ease-out 0.4s both;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .base-url-chip:hover {
+            border-color: var(--border-hover);
+            background: rgba(34, 211, 238, 0.04);
+        }
+
+        .base-url-chip span.url {
+            color: var(--cyan);
+        }
+
+        .chip-copy {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            margin-left: 0.25rem;
+            transition: color 0.2s;
+        }
+
+        .base-url-chip:hover .chip-copy {
+            color: var(--cyan);
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        /* ── Section ── */
+        section {
+            padding: 4rem 0;
+        }
+
+        .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            padding: 0.35rem 0.9rem;
+            border-radius: 9999px;
+            margin-bottom: 1rem;
+        }
+
+        .section-label.cyan {
+            background: rgba(34, 211, 238, 0.06);
+            color: rgba(34, 211, 238, 0.8);
+            border: 1px solid rgba(34, 211, 238, 0.15);
+        }
+
+        .section-label.emerald {
+            background: rgba(52, 211, 153, 0.06);
+            color: rgba(52, 211, 153, 0.8);
+            border: 1px solid rgba(52, 211, 153, 0.15);
+        }
+
+        .section-label.purple {
+            background: rgba(168, 85, 247, 0.06);
+            color: rgba(168, 85, 247, 0.8);
+            border: 1px solid rgba(168, 85, 247, 0.15);
+        }
+
+        .section-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-sub {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* ── Stats row ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 4rem;
+        }
+
+        .stat-card {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 1.25rem;
+            padding: 1.75rem 1.5rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            filter: blur(40px);
+            transition: all 0.5s;
+        }
+
+        .stat-card.cyan-card::before {
+            background: rgba(34, 211, 238, 0.1);
+        }
+
+        .stat-card.emerald-card::before {
+            background: rgba(52, 211, 153, 0.1);
+        }
+
+        .stat-card.purple-card::before {
+            background: rgba(168, 85, 247, 0.1);
+        }
+
+        .stat-card:hover {
+            background: var(--glass-hover);
+            transform: translateY(-4px);
+        }
+
+        .stat-card:hover.cyan-card {
+            border-color: rgba(34, 211, 238, 0.25);
+            box-shadow: 0 16px 48px -12px rgba(34, 211, 238, 0.1);
+        }
+
+        .stat-card:hover.emerald-card {
+            border-color: rgba(52, 211, 153, 0.25);
+            box-shadow: 0 16px 48px -12px rgba(52, 211, 153, 0.1);
+        }
+
+        .stat-card:hover.purple-card {
+            border-color: rgba(168, 85, 247, 0.25);
+            box-shadow: 0 16px 48px -12px rgba(168, 85, 247, 0.1);
+        }
+
+        .stat-value {
+            font-size: 2.25rem;
+            font-weight: 300;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value.cyan {
+            color: #67e8f9;
+        }
+
+        .stat-value.emerald {
+            color: var(--emerald);
+        }
+
+        .stat-value.purple {
+            color: #c084fc;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+        }
+
+        /* ── Endpoints ── */
+        .endpoints-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+
+        .endpoint-card {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            color: inherit;
+            cursor: default;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .endpoint-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            border-radius: 0 2px 2px 0;
+            transition: opacity 0.3s;
+            opacity: 0;
+        }
+
+        .endpoint-card:hover {
+            background: var(--glass-hover);
+            border-color: var(--border-hover);
+            transform: translateX(4px);
+        }
+
+        .endpoint-card:hover::before {
+            opacity: 1;
+        }
+
+        .endpoint-card.get::before {
+            background: var(--cyan);
+        }
+
+        .endpoint-card.post::before {
+            background: var(--emerald);
+        }
+
+        .endpoint-card.mixed::before {
+            background: var(--purple);
+        }
+
+        .method-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            font-weight: 600;
+            padding: 0.3rem 0.65rem;
+            border-radius: 0.4rem;
+            min-width: 48px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .method-badge.get {
+            background: rgba(34, 211, 238, 0.08);
+            color: var(--cyan);
+            border: 1px solid rgba(34, 211, 238, 0.15);
+        }
+
+        .method-badge.post {
+            background: rgba(52, 211, 153, 0.08);
+            color: var(--emerald);
+            border: 1px solid rgba(52, 211, 153, 0.15);
+        }
+
+        .method-badge.del {
+            background: rgba(239, 68, 68, 0.08);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.15);
+        }
+
+        .method-badge.multi {
+            background: rgba(168, 85, 247, 0.08);
+            color: #c084fc;
+            border: 1px solid rgba(168, 85, 247, 0.15);
+            font-size: 0.58rem;
+        }
+
+        .endpoint-path {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            color: white;
+            font-weight: 500;
+            flex-shrink: 0;
+            min-width: 220px;
+        }
+
+        .endpoint-desc {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+
+        .endpoint-auth {
+            margin-left: auto;
+            flex-shrink: 0;
+            font-size: 0.65rem;
+            font-weight: 600;
+            padding: 0.2rem 0.6rem;
+            border-radius: 9999px;
+        }
+
+        .endpoint-auth.public {
+            background: rgba(52, 211, 153, 0.06);
+            color: rgba(52, 211, 153, 0.7);
+            border: 1px solid rgba(52, 211, 153, 0.12);
+        }
+
+        .endpoint-auth.authed {
+            background: rgba(251, 191, 36, 0.06);
+            color: rgba(251, 191, 36, 0.7);
+            border: 1px solid rgba(251, 191, 36, 0.12);
+        }
+
+        /* ── Code block ── */
+        .code-card {
+            background: rgba(0, 0, 0, 0.45);
+            border: 1px solid var(--border);
+            border-radius: 1.25rem;
+            overflow: hidden;
+            transition: border-color 0.3s;
+        }
+
+        .code-card:hover {
+            border-color: rgba(34, 211, 238, 0.15);
+        }
+
+        .code-tabs {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.65rem 1.25rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .code-tabs-left {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .tab-pill {
+            font-size: 0.72rem;
+            font-weight: 500;
+            padding: 0.3rem 0.8rem;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.25s;
+            color: var(--text-muted);
+            background: transparent;
+            border: 1px solid transparent;
+        }
+
+        .tab-pill.active {
+            color: white;
+            background: rgba(34, 211, 238, 0.1);
+            border-color: rgba(34, 211, 238, 0.25);
+        }
+
+        .tab-pill:not(.active):hover {
+            color: var(--text-mid);
+        }
+
+        .copy-btn {
+            font-size: 0.68rem;
+            font-weight: 600;
+            padding: 0.3rem 0.75rem;
+            border-radius: 0.4rem;
+            cursor: pointer;
+            transition: all 0.25s;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(34, 211, 238, 0.3);
+            color: white;
+        }
+
+        .code-body {
+            padding: 1.5rem;
+            overflow-x: auto;
+        }
+
+        .code-body pre {
+            margin: 0;
+        }
+
+        .code-body code {
+            font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.8rem;
+            line-height: 1.9;
+            color: #d1d5db;
+        }
+
+        .s {
+            color: #86efac;
+        }
+
+        /* string */
+        .k {
+            color: #7dd3fc;
+        }
+
+        /* keyword/command */
+        .c {
+            color: #9ca3af;
+        }
+
+        /* flag */
+        .p {
+            color: #c084fc;
+        }
+
+        /* property */
+        .n {
+            color: #fde68a;
+        }
+
+        /* number */
+
+        /* ── SDK Cards ── */
+        .sdk-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+        }
+
+        .sdk-card {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 1.25rem;
+            padding: 1.5rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sdk-card:hover {
+            background: var(--glass-hover);
+            border-color: var(--border-hover);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px -15px rgba(34, 211, 238, 0.1);
+        }
+
+        .sdk-icon {
+            font-size: 1.75rem;
+            margin-bottom: 0.85rem;
+        }
+
+        .sdk-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.35rem;
+        }
+
+        .sdk-code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            color: var(--cyan);
+            background: rgba(34, 211, 238, 0.05);
+            border: 1px solid rgba(34, 211, 238, 0.1);
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            margin-top: 0.6rem;
+            white-space: nowrap;
+            overflow: auto;
+        }
+
+        /* ── Footer ── */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 2.5rem 0;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        footer a {
+            color: var(--text-mid);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        footer a:hover {
+            color: var(--cyan);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        /* ── Divider ── */
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 0;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 640px) {
+            .stats-row {
+                grid-template-columns: 1fr;
+            }
+
+            .endpoint-card {
+                flex-wrap: wrap;
+            }
+
+            .endpoint-path {
+                min-width: unset;
+            }
+
+            .endpoint-auth {
+                margin-left: 0;
+                margin-top: 0.25rem;
+            }
+
+            .nav-links .btn-ghost {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Orbs -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <!-- Nav -->
+    <nav>
+        <div class="nav-inner">
+            <a href="https://clex.in" class="nav-logo">
+                <div class="nav-logo-dot"></div>
+                CLEX
+                <span
+                    style="color:var(--text-muted);font-weight:400;font-size:0.85rem;font-family:'JetBrains Mono',monospace">API</span>
+            </a>
+            <div class="nav-links">
+                <a href="https://clex.in/docs.html" class="nav-link">Docs</a>
+                <a href="https://api.clex.in/dashboard" class="nav-link">Dashboard</a>
+                <a href="https://clex.in" class="nav-link btn-ghost btn"
+                    style="padding:0.45rem 1rem;font-size:0.82rem">clex.in ↗</a>
+                <a href="https://clex.in/login.html" class="nav-link cta">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="wrap">
+        <!-- Hero -->
+        <div class="hero">
+            <div class="hero-badge">
+                <div class="status-dot" id="status-dot"></div>
+                <span id="status-text">Checking status…</span>
+            </div>
+
+            <h1>
+                The <span class="gradient-text">CLEX</span> API
+            </h1>
+            <p class="hero-sub">
+                One unified, OpenAI-compatible endpoint for hundreds of AI models.
+                Drop-in replacement for your existing SDK. No vendor lock-in.
+            </p>
+
+            <div class="hero-btns">
+                <a href="https://clex.in/docs.html" class="btn btn-white">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Read the Docs
+                </a>
+                <a href="/dashboard" class="btn btn-ghost">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+                    </svg>
+                    Dashboard
+                </a>
+                <a href="https://clex.in/login.html" class="btn btn-cyan">
+                    Get API Key →
+                </a>
+            </div>
+
+            <div class="base-url-chip" onclick="copyBaseUrl(this)" title="Click to copy">
+                <span
+                    style="color:var(--text-muted);font-size:0.72rem;font-family:'Inter',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:0.08em">Base
+                    URL</span>
+                <span class="url">https://api.clex.in/v1</span>
+                <span class="chip-copy">Copy</span>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-row">
+            <div class="stat-card cyan-card">
+                <div class="stat-value cyan" id="stat-models">—</div>
+                <div class="stat-label">AI Models</div>
+            </div>
+            <div class="stat-card emerald-card">
+                <div class="stat-value emerald" id="stat-status">Checking</div>
+                <div class="stat-label">API Status</div>
+            </div>
+            <div class="stat-card purple-card">
+                <div class="stat-value purple">v1</div>
+                <div class="stat-label">API Version</div>
+            </div>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- Endpoints -->
+        <section>
+            <div style="margin-bottom:2rem">
+                <div class="section-label cyan">Endpoints</div>
+                <h2 class="section-title">API Reference</h2>
+                <p class="section-sub">All routes are prefixed with <code
+                        style="font-family:'JetBrains Mono',monospace;color:var(--cyan);font-size:0.82rem">https://api.clex.in</code>
+                </p>
+            </div>
+
+            <div class="endpoints-grid">
+                <div class="endpoint-card get">
+                    <span class="method-badge get">GET</span>
+                    <span class="endpoint-path">/v1/health</span>
+                    <span class="endpoint-desc">Service health check — returns status, uptime, and version</span>
+                    <span class="endpoint-auth public">Public</span>
+                </div>
+                <div class="endpoint-card get">
+                    <span class="method-badge get">GET</span>
+                    <span class="endpoint-path">/v1/models</span>
+                    <span class="endpoint-desc">List all available AI models across every provider</span>
+                    <span class="endpoint-auth public">Public</span>
+                </div>
+                <div class="endpoint-card post">
+                    <span class="method-badge post">POST</span>
+                    <span class="endpoint-path">/v1/chat/completions</span>
+                    <span class="endpoint-desc">OpenAI-compatible chat completions with streaming support</span>
+                    <span class="endpoint-auth authed">API Key</span>
+                </div>
+                <div class="endpoint-card mixed">
+                    <span class="method-badge multi">GET · POST · DEL</span>
+                    <span class="endpoint-path">/v1/keys</span>
+                    <span class="endpoint-desc">List, create, and revoke your API keys</span>
+                    <span class="endpoint-auth authed">Firebase Auth</span>
+                </div>
+                <div class="endpoint-card get">
+                    <span class="method-badge get">GET</span>
+                    <span class="endpoint-path">/v1/usage</span>
+                    <span class="endpoint-desc">Token usage and cost breakdown for your account</span>
+                    <span class="endpoint-auth authed">Firebase Auth</span>
+                </div>
+                <div class="endpoint-card get">
+                    <span class="method-badge get">GET</span>
+                    <span class="endpoint-path">/v1/analytics</span>
+                    <span class="endpoint-desc">Detailed analytics — model usage, latency, error rates</span>
+                    <span class="endpoint-auth authed">Firebase Auth</span>
+                </div>
+            </div>
+        </section>
+
+        <hr class="divider" />
+
+        <!-- Quick Start -->
+        <section>
+            <div style="margin-bottom:2rem">
+                <div class="section-label emerald">Quick Start</div>
+                <h2 class="section-title">Start in 30 seconds</h2>
+                <p class="section-sub">Drop-in replacement for the OpenAI SDK. Change two lines.</p>
+            </div>
+
+            <div class="code-card">
+                <div class="code-tabs">
+                    <div class="code-tabs-left">
+                        <button class="tab-pill active" onclick="switchTab(this, 'curl')">cURL</button>
+                        <button class="tab-pill" onclick="switchTab(this, 'python')">Python</button>
+                        <button class="tab-pill" onclick="switchTab(this, 'node')">Node.js</button>
+                    </div>
+                    <button class="copy-btn" id="copy-code-btn" onclick="copyCode()">Copy</button>
+                </div>
+                <div class="code-body">
+                    <pre id="code-curl"><code><span class="k">curl</span> https://api.clex.in/v1/chat/completions \
+  <span class="c">-H</span> <span class="s">"Content-Type: application/json"</span> \
+  <span class="c">-H</span> <span class="s">"Authorization: Bearer YOUR_API_KEY"</span> \
+  <span class="c">-d</span> <span class="s">'{</span>
+    <span class="p">"model"</span><span class="s">:</span> <span class="s">"meta/llama-3.3-70b-instruct"</span><span class="s">,</span>
+    <span class="p">"messages"</span><span class="s">: [{ "role": "user", "content": "Hello!" }],</span>
+    <span class="p">"stream"</span><span class="s">:</span> <span class="n">false</span>
+  <span class="s">}'</span></code></pre>
+
+                    <pre id="code-python" style="display:none"><code><span class="c"># pip install openai</span>
+<span class="k">from</span> openai <span class="k">import</span> OpenAI
+
+client = OpenAI(
+  base_url=<span class="s">"https://api.clex.in/v1"</span>,
+  api_key=<span class="s">"YOUR_API_KEY"</span>,
+)
+
+response = client.chat.completions.create(
+  model=<span class="s">"meta/llama-3.3-70b-instruct"</span>,
+  messages=[{<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: <span class="s">"Hello!"</span>}],
+)
+<span class="k">print</span>(response.choices[<span class="n">0</span>].message.content)</code></pre>
+
+                    <pre id="code-node" style="display:none"><code><span class="c">// npm install openai</span>
+<span class="k">import</span> OpenAI <span class="k">from</span> <span class="s">"openai"</span><span class="k">;</span>
+
+<span class="k">const</span> client = <span class="k">new</span> OpenAI({
+  baseURL: <span class="s">"https://api.clex.in/v1"</span>,
+  apiKey: <span class="s">"YOUR_API_KEY"</span>,
+});
+
+<span class="k">const</span> res = <span class="k">await</span> client.chat.completions.create({
+  model: <span class="s">"meta/llama-3.3-70b-instruct"</span>,
+  messages: [{ role: <span class="s">"user"</span>, content: <span class="s">"Hello!"</span> }],
+});
+console.log(res.choices[<span class="n">0</span>].message.content);</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <hr class="divider" />
+
+        <!-- SDK Compatibility -->
+        <section>
+            <div style="margin-bottom:2rem">
+                <div class="section-label purple">Compatibility</div>
+                <h2 class="section-title">Works with your stack</h2>
+                <p class="section-sub">Any SDK that speaks OpenAI's protocol works out of the box.</p>
+            </div>
+            <div class="sdk-grid">
+                <div class="sdk-card">
+                    <div class="sdk-icon">🐍</div>
+                    <div class="sdk-name">Python</div>
+                    <div style="font-size:0.8rem;color:var(--text-muted)">Official OpenAI SDK</div>
+                    <div class="sdk-code">pip install openai</div>
+                </div>
+                <div class="sdk-card">
+                    <div class="sdk-icon">🟨</div>
+                    <div class="sdk-name">JavaScript / TypeScript</div>
+                    <div style="font-size:0.8rem;color:var(--text-muted)">OpenAI Node SDK</div>
+                    <div class="sdk-code">npm install openai</div>
+                </div>
+                <div class="sdk-card">
+                    <div class="sdk-icon">🦀</div>
+                    <div class="sdk-name">Rust</div>
+                    <div style="font-size:0.8rem;color:var(--text-muted)">async-openai crate</div>
+                    <div class="sdk-code">async-openai</div>
+                </div>
+                <div class="sdk-card">
+                    <div class="sdk-icon">💻</div>
+                    <div class="sdk-name">cURL / HTTP</div>
+                    <div style="font-size:0.8rem;color:var(--text-muted)">Any HTTP client</div>
+                    <div class="sdk-code">fetch · axios · httpx</div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-links">
+            <a href="https://clex.in">Platform</a>
+            <a href="https://clex.in/docs.html">Documentation</a>
+            <a href="https://clex.in/models.html">Models</a>
+            <a href="https://clex.in/pricing.html">Pricing</a>
+            <a href="https://clex.in/support.html">Support</a>
+            <a href="https://clex.in/privacy.html">Privacy</a>
+            <a href="https://api.clex.in/v1/health">Health</a>
+        </div>
+        <p>© 2026 CLEX · <a href="https://clex.in">clex.in</a> · Built for developers</p>
+    </footer>
+
+    <script>
+        // ── Live Status ──
+        async function checkStatus() {
+            const dot = document.getElementById('status-dot');
+            const text = document.getElementById('status-text');
+            const statStatus = document.getElementById('stat-status');
+            try {
+                const res = await fetch('/v1/health');
+                const data = await res.json();
+                if (res.ok) {
+                    dot.className = 'status-dot';
+                    text.textContent = 'All Systems Operational';
+                    statStatus.textContent = 'Healthy';
+                } else {
+                    dot.className = 'status-dot degraded';
+                    text.textContent = 'Degraded';
+                    statStatus.textContent = 'Degraded';
+                }
+            } catch {
+                dot.className = 'status-dot error';
+                text.textContent = 'Unreachable';
+                statStatus.textContent = 'Unknown';
+            }
+        }
+
+        // ── Model Count ──
+        async function loadModelCount() {
+            try {
+                const res = await fetch('/v1/models');
+                const data = await res.json();
+                const count = data?.data?.length || data?.models?.length || 0;
+                if (count > 0) {
+                    animateCount(document.getElementById('stat-models'), count);
+                }
+            } catch { }
+        }
+
+        function animateCount(el, target) {
+            let current = 0;
+            const step = Math.ceil(target / 40);
+            const timer = setInterval(() => {
+                current = Math.min(current + step, target);
+                el.textContent = current + '+';
+                if (current >= target) clearInterval(timer);
+            }, 30);
+        }
+
+        // ── Code Tabs ──
+        let activeTab = 'curl';
+        function switchTab(btn, tab) {
+            activeTab = tab;
+            document.querySelectorAll('.tab-pill').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            ['curl', 'python', 'node'].forEach(t => {
+                document.getElementById('code-' + t).style.display = t === tab ? 'block' : 'none';
+            });
+        }
+
+        // ── Copy code ──
+        const rawCode = {
+            curl: `curl https://api.clex.in/v1/chat/completions \\
+  -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer YOUR_API_KEY" \\
+  -d '{"model":"meta/llama-3.3-70b-instruct","messages":[{"role":"user","content":"Hello!"}],"stream":false}'`,
+            python: `from openai import OpenAI
+
+client = OpenAI(
+  base_url="https://api.clex.in/v1",
+  api_key="YOUR_API_KEY",
+)
+response = client.chat.completions.create(
+  model="meta/llama-3.3-70b-instruct",
+  messages=[{"role": "user", "content": "Hello!"}],
+)
+print(response.choices[0].message.content)`,
+            node: `import OpenAI from "openai";
+
+const client = new OpenAI({
+  baseURL: "https://api.clex.in/v1",
+  apiKey: "YOUR_API_KEY",
+});
+const res = await client.chat.completions.create({
+  model: "meta/llama-3.3-70b-instruct",
+  messages: [{ role: "user", content: "Hello!" }],
+});
+console.log(res.choices[0].message.content);`
+        };
+
+        function copyCode() {
+            navigator.clipboard.writeText(rawCode[activeTab]).then(() => {
+                const btn = document.getElementById('copy-code-btn');
+                btn.textContent = 'Copied!';
+                setTimeout(() => btn.textContent = 'Copy', 2000);
+            });
+        }
+
+        // ── Copy base URL ──
+        function copyBaseUrl(el) {
+            navigator.clipboard.writeText('https://api.clex.in/v1').then(() => {
+                const chip = el.querySelector('.chip-copy');
+                chip.textContent = 'Copied!';
+                setTimeout(() => chip.textContent = 'Copy', 2000);
+            });
+        }
+
+        // ── Init ──
+        checkStatus();
+        loadModelCount();
+    </script>
+</body>
+
+</html>
