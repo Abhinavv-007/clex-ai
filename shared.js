@@ -103,12 +103,14 @@ function renderHeader(pageKey, options = {}) {
 
 function renderFooter() {
   return `
-    <footer class="w-full pt-10 pb-8 border-t border-white/[0.04] bg-[#050505]/90 backdrop-blur-md z-20 mt-auto relative">
+    <footer class="w-full pt-12 pb-10 border-t border-white/[0.04] bg-[#050505]/95 backdrop-blur-md z-20 mt-auto relative">
       <div class="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-16">
-        <div class="flex flex-wrap justify-center md:justify-between items-center gap-6 text-sm text-[#555]">
-          <div class="flex items-center gap-3">
+        
+        <!-- Top Footer Section -->
+        <div class="flex flex-wrap justify-center md:justify-between items-center gap-6 text-sm text-[#555] mb-10">
+          <div class="flex flex-col md:flex-row items-center gap-3">
             <span class="text-xs font-bold tracking-[0.25em] text-[#888] uppercase">CLEX</span>
-            <span class="text-[#333]">·</span>
+            <span class="text-[#333] hidden md:inline">·</span>
             <span id="copyright-year"></span> clex.in
           </div>
           <div class="flex flex-wrap justify-center items-center gap-8 text-xs tracking-wide uppercase font-medium">
@@ -118,23 +120,31 @@ function renderFooter() {
           </div>
         </div>
         
-        <div class="mt-8 pt-6 border-t border-white/[0.02] flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium tracking-wide">
-          <div class="flex flex-wrap items-center justify-center gap-3 text-[#555]">
-            <span class="text-[#888]">A project by <a href="https://abhnv.in" target="_blank" class="text-white hover:text-[#c9a96e] transition-colors no-underline">Abhinav</a></span>
-            <span class="text-[#333] hidden sm:inline">|</span>
-            <a href="https://abhnv.in" target="_blank" class="hover:text-white transition-colors no-underline">abhnv.in</a>
-            <span class="text-[#333] hidden sm:inline">|</span>
-            <a href="https://abhnv.me" target="_blank" class="hover:text-white transition-colors no-underline">abhnv.me</a>
-            <span class="text-[#333] hidden sm:inline">|</span>
-            <a href="https://lnch.in" target="_blank" class="hover:text-white transition-colors no-underline">lnch.in</a>
+        <!-- Elegant Branding Showcase Section -->
+        <div class="pt-8 border-t border-white/[0.04] flex flex-col items-center justify-center gap-6">
+          <div class="flex flex-col items-center gap-4 text-center">
+            <div class="flex items-center justify-center gap-3">
+              <span class="text-sm font-medium tracking-wide text-[#888]">
+                A project by <strong class="text-white font-semibold">Abhinav</strong>
+              </span>
+              <a href="https://www.linkedin.com/in/abhnv07/" target="_blank" rel="noopener noreferrer" class="hover:opacity-80 transition-opacity transform hover:scale-105 duration-200" title="Connect on LinkedIn">
+                <!-- Latest LinkedIn Square Logo (Official Blue) -->
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="#0A66C2" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                </svg>
+              </a>
+            </div>
+            
+            <div class="flex flex-wrap justify-center items-center gap-4 sm:gap-6 text-sm">
+              <a href="https://abhnv.in" target="_blank" rel="noopener noreferrer" class="text-[#666] hover:text-[#c9a96e] hover:-translate-y-0.5 transition-all duration-300 font-medium no-underline tracking-wide">abhnv.in</a>
+              <span class="w-1 h-1 rounded-full bg-white/20 hidden sm:block"></span>
+              <a href="https://abhnv.me" target="_blank" rel="noopener noreferrer" class="text-[#666] hover:text-[#c9a96e] hover:-translate-y-0.5 transition-all duration-300 font-medium no-underline tracking-wide">abhnv.me</a>
+              <span class="w-1 h-1 rounded-full bg-white/20 hidden sm:block"></span>
+              <a href="https://lnch.in" target="_blank" rel="noopener noreferrer" class="text-[#666] hover:text-[#c9a96e] hover:-translate-y-0.5 transition-all duration-300 font-medium no-underline tracking-wide">lnch.in</a>
+            </div>
           </div>
-          <a href="https://www.linkedin.com/in/abhnv07/" target="_blank" class="group flex items-center gap-2 text-[#555] hover:text-[#0a66c2] transition-colors no-underline" aria-label="LinkedIn">
-            <svg class="w-4 h-4 fill-current transition-transform group-hover:scale-110" viewBox="0 0 24 24">
-              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-            </svg>
-            <span class="text-[10px] uppercase tracking-[0.1em] font-bold">Connect</span>
-          </a>
         </div>
+
       </div>
     </footer>
   `;
