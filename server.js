@@ -524,11 +524,42 @@ app.post('/api/playground/chat', requireFirebaseAuth, async (req, res) => {
 });
 
 // ─── Health Check ───────────────────────────────────────
-app.get('/api/health', (req, res) => {
+// Standardized payload consumed by lnch.in's LaunchOps health probe and
+// any external uptime monitor. `/health` and `/v1/health` are aliases so
+// every callsite — including OpenAI-compatible clients pointed at /v1 —
+// can probe with the same shape.
+const healthHandler = (req, res) => {
+    res.set('Cache-Control', 'public, max-age=10, s-maxage=30');
     res.json({
-        status: 'ok',
+        ok: true,
+        service: 'clex-ai',
+        ts: Math.floor(Date.now() / 1000),
+        version: 'phase-1-public-face',
         clex_key_configured: !!(process.env.CLEX_API_KEY || process.env.NVIDIA_API_KEY),
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+    });
+};
+app.get('/api/health', healthHandler);
+app.get('/health', healthHandler);
+app.get('/v1/health', healthHandler);
+
+// ─── Public Summary ─────────────────────────────────────
+// Tiny, public-safe overview. clex-ai is a stateless gateway so we can
+// only publish what's true at boot — no per-key, per-IP, per-model data.
+app.get('/api/public/summary', (req, res) => {
+    res.set('Cache-Control', 'public, max-age=60, s-maxage=120, stale-while-revalidate=300');
+    res.json({
+        service: 'clex-ai',
+        generatedAt: Math.floor(Date.now() / 1000),
+        gateway: {
+            type: 'openai-compatible',
+            keyConfigured: !!(process.env.CLEX_API_KEY || process.env.NVIDIA_API_KEY),
+        },
+        endpoints: {
+            chatCompletions: '/v1/chat/completions',
+            models: '/v1/models',
+            health: '/api/health',
+        },
     });
 });
 
