@@ -79,7 +79,12 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   const upstream = env.NVIDIA_UPSTREAM_URL || 'https://integrate.api.nvidia.com/v1/chat/completions';
   const upstreamKey = env.CLEX_API_KEY;
   if (!upstreamKey) {
-    return serverError('upstream_key_not_configured', request, env);
+    return serverError(
+      'Clex AI is not fully configured: the upstream NVIDIA API key (CLEX_API_KEY) is missing. ' +
+        'Set it with `wrangler pages secret put CLEX_API_KEY --project-name clex-ai` and redeploy.',
+      request,
+      env
+    );
   }
 
   const shouldStream = body.stream !== false;

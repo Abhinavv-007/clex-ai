@@ -55,13 +55,8 @@ function renderAuthActions(options) {
 
   if (isLoggedIn) {
     return `
-      <div class="hidden xl:flex items-center gap-2 bg-white/[0.03] border border-white/[0.06] rounded-full px-3 py-1 text-xs text-[#888]">
-        <span class="w-1.5 h-1.5 rounded-full bg-[#c9a96e]"></span>
-        <span>Signed in</span>
-      </div>
-      <a href="${dashboardHref}" class="text-sm font-medium text-[#888] hover:text-white transition-colors no-underline">Dashboard</a>
-      <button type="button" data-clex-signout class="text-sm font-medium text-[#888] hover:text-white transition-colors">Sign Out</button>
-      <a href="${dashboardHref}" class="text-sm font-medium px-5 py-2 rounded-full bg-white/[0.06] border border-white/[0.08] text-white hover:bg-white/[0.1] hover:border-white/[0.15] transition-all no-underline">Open dashboard</a>
+      <button type="button" data-clex-signout class="text-sm font-medium text-[#888] hover:text-white transition-colors hidden sm:block">Sign Out</button>
+      <a href="${dashboardHref}" class="text-sm font-medium px-5 py-2 rounded-full bg-white/[0.06] border border-white/[0.08] text-white hover:bg-white/[0.1] hover:border-white/[0.15] transition-all no-underline">Dashboard</a>
     `;
   }
 
