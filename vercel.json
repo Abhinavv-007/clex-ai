@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "_comment": "This project ships from Cloudflare Pages, NOT Vercel. The vercel.json is here so any leftover Vercel GitHub integration on a fork sees `ignoreCommand: exit 0` (== skip this deploy) instead of failing. To remove Vercel entirely, disconnect the project at https://vercel.com/dashboard → project → Settings → Git → Disconnect.",
+  "ignoreCommand": "exit 0",
+  "buildCommand": "echo 'Skipping Vercel build — this site deploys from Cloudflare Pages.' && mkdir -p public && echo '<!doctype html><meta http-equiv=\"refresh\" content=\"0;url=https://ai.clex.in\">' > public/index.html",
+  "outputDirectory": "public",
+  "framework": null,
+  "github": {
+    "silent": true,
+    "autoAlias": false
+  }
+}
