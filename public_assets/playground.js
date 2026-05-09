@@ -45,9 +45,10 @@ const els = {
   status: $("ide-status"),
   template: $("template-select"),
   modelInput: $("model-input"),
-  modelOptions: $("model-options"),
-  modelCreditHint: $("model-credit-hint"),
+  modelName: $("chat-model-name"),
+  modelCost: $("chat-model-cost"),
   apiKey: $("clex-api-key"),
+  apiKeyLabel: $("chat-key-label"),
   bootBtn: $("boot-btn"),
   installBtn: $("install-btn"),
   runBtn: $("run-btn"),
@@ -64,7 +65,9 @@ const els = {
   chatSend: $("chat-send"),
   chatClear: $("chat-clear"),
   chatSuggest: $("chat-suggest"),
-  contextHint: $("chat-context-hint"),
+  chatContext: $("chat-context"),
+  chatModeHint: $("chat-mode-hint"),
+  modeTabs: $$(".ide-mode-tab"),
   previewFrame: $("preview-frame"),
   previewWrap: $("preview-frame-wrap"),
   previewUrl: $("preview-url"),
@@ -76,8 +79,33 @@ const els = {
   dock: document.querySelector(".ide-dock"),
   deviceBtns: $$(".ide-chip--device"),
   logs: $("logs"),
-  clearLogs: $("clear-logs"),
 };
+
+// ───── Mode definitions (Cursor-style: Ask / Agent / Edit) ─────
+//
+// Ask  → answer questions, never propose file edits.
+// Agent→ free-roam: scaffold + edit any file in the project as needed.
+// Edit → focus on the active file only, return its full new contents.
+
+const MODES = {
+  ask: {
+    hint: "Q&A about the active file — won't edit unless you ask.",
+    systemHeader:
+      "You are the Clex AI assistant. The user is browsing a multi-file web project in an in-browser sandbox. Answer questions clearly and concisely. Do NOT propose file edits unless the user explicitly asks for code changes; if you do, use fenced ```lang file=path blocks with the full new file contents.",
+  },
+  agent: {
+    hint: "Agent — can scaffold and edit any file in the project.",
+    systemHeader:
+      "You are the Clex AI agent inside the in-browser IDE. Plan, then write code. When you change files, emit fenced code blocks tagged ```lang file=path/to/file with the COMPLETE new contents (not a diff). Keep paths relative, use forward slashes. Always include a short plain-English plan before the code blocks.",
+  },
+  edit: {
+    hint: "Edit — refactor only the active file, returns full new contents.",
+    systemHeader:
+      "You are the Clex AI inline editor. Restrict your changes to the user's ACTIVE FILE only. Reply with one fenced code block tagged ```lang file=<active-path> containing the COMPLETE new contents of that file, plus a one-paragraph summary above it. Do not touch other files.",
+  },
+};
+
+let currentMode = "ask";
 
 // ───── State ─────
 
@@ -546,6 +574,8 @@ async function openFile(path, alreadyOpen = false) {
   renderTabs();
   renderFileTree();
   updateContextHint();
+  // Refresh the mode-dependent placeholder so Edit mode names the active file.
+  setMode(currentMode);
 }
 
 async function saveActive() {
@@ -775,29 +805,61 @@ function loadModels() {
     category: m.category,
   }));
 
-  // Datalist for autocomplete.
-  els.modelOptions.innerHTML = models
-    .map((m) => `<option value="${escapeAttr(m.id)}">${escapeAttr(m.name)} · ${m.credits} cr</option>`)
-    .join("");
+  if (!els.modelInput) return;
 
-  // Default to a sensible coder model if available.
-  const defaultModel =
-    models.find((m) => m.id === "moonshotai/kimi-k2-instruct") ||
-    models.find((m) => /coder/i.test(m.name)) ||
-    models[0];
-  if (defaultModel && !els.modelInput.value) {
-    els.modelInput.value = defaultModel.id;
+  // Group models by tier and emit grouped <optgroup>s, sorted by credit cost.
+  const tiers = {
+    1: { label: "1 cr — small / utility", models: [] },
+    2: { label: "2 cr — medium", models: [] },
+    3: { label: "3 cr — large", models: [] },
+    5: { label: "5 cr — premium", models: [] },
+  };
+  for (const m of models) {
+    const tier = tiers[m.credits] || tiers[1];
+    tier.models.push(m);
   }
+  els.modelInput.innerHTML = "";
+  for (const credits of [1, 2, 3, 5]) {
+    const tier = tiers[credits];
+    if (!tier.models.length) continue;
+    const grp = document.createElement("optgroup");
+    grp.label = tier.label;
+    for (const m of tier.models) {
+      const opt = document.createElement("option");
+      opt.value = m.id;
+      opt.textContent = `${m.name} (${m.publisher})`;
+      opt.dataset.credits = String(m.credits);
+      grp.appendChild(opt);
+    }
+    els.modelInput.appendChild(grp);
+  }
+
+  const defaultId =
+    "moonshotai/kimi-k2-instruct" in Object.fromEntries(models.map((m) => [m.id, m.id]))
+      ? "moonshotai/kimi-k2-instruct"
+      : (models.find((m) => /coder/i.test(m.name)) || models[0])?.id;
+  if (defaultId) els.modelInput.value = defaultId;
   updateCreditHint();
 }
 
 function updateCreditHint() {
   const id = (els.modelInput?.value || "").trim();
   const m = (window.CLEX_MODELS || []).find((x) => x.nvidiaId === id);
-  if (m) {
-    els.modelCreditHint.textContent = `${m.credits ?? 1} cr / call`;
+  if (els.modelName) els.modelName.textContent = id || "select model";
+  if (els.modelCost) {
+    els.modelCost.textContent = m ? `${m.credits ?? 1} cr` : "—";
+  }
+}
+
+function updateApiKeyLabel() {
+  if (!els.apiKeyLabel) return;
+  const v = (els.apiKey?.value || "").trim();
+  if (!v) {
+    els.apiKeyLabel.textContent = "Auto key";
+  } else if (v.startsWith("clex_")) {
+    els.apiKeyLabel.textContent = `Key …${v.slice(-4)}`;
   } else {
-    els.modelCreditHint.textContent = "—";
+    els.apiKeyLabel.textContent = "Custom key";
   }
 }
 
@@ -865,21 +927,30 @@ function renderAiContent(target, raw) {
       const safe = escapeHtml(p.text)
         .replace(/`([^`]+)`/g, "<code>$1</code>")
         .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-        .replace(/\n{2,}/g, "<br><br>")
+        .replace(/\n{2,}/g, "</p><p>")
         .replace(/\n/g, "<br>");
-      html += safe;
+      html += `<p>${safe}</p>`;
     } else {
+      const langLabel = (p.lang || "text").toUpperCase();
+      const headerLeft = p.path
+        ? `<span class="ide-code-block-path" title="${escapeAttr(p.path)}">${escapeHtml(p.path)}</span><span class="ide-code-block-lang">${escapeHtml(langLabel)}</span>`
+        : `<span class="ide-code-block-path">code</span><span class="ide-code-block-lang">${escapeHtml(langLabel)}</span>`;
+      const idAttr = p.path ? `data-edit-index="${editIndex}"` : "";
+      const applyBtn = p.path
+        ? `<button class="ide-code-block-btn ide-chat-edit-apply" data-apply-index="${editIndex}" type="button">Apply</button>`
+        : "";
+      const copyBtn = `<button class="ide-code-block-btn ide-chat-edit-copy" data-copy-index="${editIndex}" type="button">Copy</button>`;
       const code = escapeHtml(p.code);
-      html += `<pre data-lang="${escapeAttr(p.lang)}"><code>${code}</code></pre>`;
-      if (p.path) {
-        edits.push({ index: editIndex, path: p.path, code: p.code });
-        html += `
-          <div class="ide-chat-edit" data-edit-index="${editIndex}">
-            <span class="ide-chat-edit-path">${escapeHtml(p.path)}</span>
-            <button class="ide-chat-edit-apply" data-apply-index="${editIndex}">Apply</button>
-          </div>`;
-        editIndex += 1;
-      }
+      html += `
+        <div class="ide-code-block" ${idAttr}>
+          <div class="ide-code-block-header">
+            ${headerLeft}
+            <div class="ide-code-block-actions">${copyBtn}${applyBtn}</div>
+          </div>
+          <pre class="ide-code-block-body"><code>${code}</code></pre>
+        </div>`;
+      edits.push({ index: editIndex, path: p.path, code: p.code });
+      editIndex += 1;
     }
   }
   target.innerHTML = html;
@@ -889,7 +960,7 @@ function renderAiContent(target, raw) {
     btn.addEventListener("click", async () => {
       const idx = Number(btn.dataset.applyIndex);
       const edit = edits[idx];
-      if (!edit) return;
+      if (!edit || !edit.path) return;
       btn.disabled = true;
       btn.textContent = "Applying…";
       try {
@@ -899,6 +970,26 @@ function renderAiContent(target, raw) {
       } catch (err) {
         btn.textContent = "Failed";
         log(`[error] could not apply edit to ${edit.path}: ${err.message}`);
+      }
+    });
+  });
+  // Wire up copy buttons.
+  target.querySelectorAll(".ide-chat-edit-copy").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const idx = Number(btn.dataset.copyIndex);
+      const edit = edits[idx];
+      if (!edit) return;
+      try {
+        await navigator.clipboard.writeText(edit.code);
+        const orig = btn.textContent;
+        btn.textContent = "Copied";
+        btn.classList.add("is-applied");
+        setTimeout(() => {
+          btn.textContent = orig;
+          btn.classList.remove("is-applied");
+        }, 1200);
+      } catch (_) {
+        btn.textContent = "Failed";
       }
     });
   });
@@ -942,13 +1033,61 @@ async function buildContext() {
 }
 
 function updateContextHint() {
-  if (!els.contextHint) return;
-  if (!activePath) {
-    els.contextHint.textContent = "Context: file tree only";
-  } else {
-    els.contextHint.textContent = `Context: ${activePath}${
-      fileList.length > 1 ? ` + ${fileList.length - 1} more files` : ""
-    }`;
+  if (!els.chatContext) return;
+  els.chatContext.innerHTML = "";
+  if (!activePath && !fileList.length) {
+    const empty = document.createElement("span");
+    empty.className = "ide-chat-context-empty";
+    empty.textContent = "No context yet — boot the sandbox.";
+    els.chatContext.appendChild(empty);
+    return;
+  }
+  // Show the active file as the primary chip.
+  if (activePath) {
+    const chip = document.createElement("span");
+    chip.className = "ide-context-chip";
+    chip.title = activePath;
+    chip.innerHTML = `<span class="ide-context-chip-at">@</span>${escapeHtml(activePath)}`;
+    els.chatContext.appendChild(chip);
+  }
+  // Show open tabs (other than active) as secondary chips, max 4.
+  const others = openTabs.filter((p) => p !== activePath).slice(0, 4);
+  for (const p of others) {
+    const chip = document.createElement("span");
+    chip.className = "ide-context-chip";
+    chip.title = p;
+    chip.innerHTML = `<span class="ide-context-chip-at">@</span>${escapeHtml(p.split("/").pop())}`;
+    els.chatContext.appendChild(chip);
+  }
+  // Tail summary chip showing how many files are visible to the model.
+  if (fileList.length) {
+    const summary = document.createElement("span");
+    summary.className = "ide-chat-context-empty";
+    const otherCount = Math.max(0, fileList.length - 1 - others.length);
+    summary.textContent = otherCount > 0
+      ? `+ ${otherCount} more in tree`
+      : `${fileList.length} file${fileList.length === 1 ? "" : "s"} in tree`;
+    els.chatContext.appendChild(summary);
+  }
+}
+
+function setMode(mode) {
+  if (!MODES[mode]) return;
+  currentMode = mode;
+  if (els.modeTabs) {
+    els.modeTabs.forEach((t) => {
+      t.classList.toggle("is-active", t.dataset.mode === mode);
+      t.setAttribute("aria-selected", t.dataset.mode === mode ? "true" : "false");
+    });
+  }
+  if (els.chatModeHint) els.chatModeHint.textContent = MODES[mode].hint;
+  if (els.chatInput) {
+    els.chatInput.placeholder =
+      mode === "agent"
+        ? "Plan a feature or describe an end-to-end change — the agent can edit any file."
+        : mode === "edit"
+          ? `Refactor the active file${activePath ? ` (${activePath})` : ""}— returns full new contents.`
+          : "Ask anything about the project. The model can see the active file.";
   }
 }
 
@@ -963,15 +1102,8 @@ async function sendChat(text) {
   aiBody.textContent = "Thinking…";
 
   const context = await buildContext();
-  const systemPrompt = `You are the Clex AI in-IDE coding assistant. The user is editing a multi-file web project in an in-browser sandbox (WebContainer).
-
-When you propose code changes, respond with a short plain-English summary, then one or more fenced code blocks tagged with the target file, exactly like this:
-
-\`\`\`jsx file=src/App.jsx
-// full new contents of src/App.jsx
-\`\`\`
-
-Always emit the complete file contents (not a diff). Use forward slashes in paths and keep them relative to the project root. If you don't need to change any file, just answer normally without fenced \`file=\` blocks.
+  const modeDef = MODES[currentMode] || MODES.ask;
+  const systemPrompt = `${modeDef.systemHeader}
 
 Project context:
 ${context}`;
@@ -1121,8 +1253,16 @@ function bind() {
   els.deviceBtns.forEach((b) =>
     b.addEventListener("click", () => setDevice(b.dataset.device)),
   );
-  els.clearLogs.addEventListener("click", () => {
-    els.logs.textContent = "";
+
+  // Mode tabs (Ask / Agent / Edit) and ⌘+1–3 hotkeys.
+  els.modeTabs.forEach((t) => {
+    t.addEventListener("click", () => setMode(t.dataset.mode));
+  });
+  document.addEventListener("keydown", (e) => {
+    if (!(e.metaKey || e.ctrlKey)) return;
+    if (e.key === "1") { e.preventDefault(); setMode("ask"); }
+    else if (e.key === "2") { e.preventDefault(); setMode("agent"); }
+    else if (e.key === "3") { e.preventDefault(); setMode("edit"); }
   });
 
   // Chat
@@ -1130,9 +1270,12 @@ function bind() {
     els.chatSend.disabled = !els.chatInput.value.trim() || isStreaming;
   });
   els.chatInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+    // Enter → send. Shift+Enter → newline. Matches the in-pane help text.
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      els.chatForm.requestSubmit();
+      if (els.chatInput.value.trim() && !isStreaming) {
+        els.chatForm.requestSubmit();
+      }
     }
   });
   els.chatForm.addEventListener("submit", (e) => {
@@ -1147,8 +1290,9 @@ function bind() {
     chatHistory = [];
     els.chatThread.innerHTML = `
       <div class="ide-chat-empty">
-        <p class="ide-chat-empty-line">Ask the model to scaffold or change files.</p>
-        <p class="ide-chat-empty-hint">Code blocks tagged <code>\`\`\`lang file=path/to/file</code> show an Apply button.</p>
+        <h3 class="ide-chat-empty-title">Pair-program with Clex.</h3>
+        <p class="ide-chat-empty-line">Switch to <strong>Agent</strong> to scaffold and edit files directly. The model sees your active file plus everything in the explorer.</p>
+        <p class="ide-chat-empty-hint">Code blocks tagged <code>\`\`\`lang file=path/to/file</code> get an <strong>Apply</strong> button that writes straight to the sandbox.</p>
       </div>`;
   });
   $$(".ide-chip").forEach((chip) => {
@@ -1160,7 +1304,8 @@ function bind() {
     });
   });
 
-  els.modelInput.addEventListener("input", updateCreditHint);
+  els.modelInput.addEventListener("change", updateCreditHint);
+  els.apiKey.addEventListener("input", updateApiKeyLabel);
 
   // Bootstrapping the model list as soon as models-data.js has loaded.
   if (window.CLEX_MODELS) {
@@ -1174,5 +1319,8 @@ function bind() {
 }
 
 bind();
+setMode("ask");
+updateContextHint();
+updateApiKeyLabel();
 setStatus("idle", "Idle");
 log("Welcome to the Clex AI IDE. Click Boot sandbox to start.");
