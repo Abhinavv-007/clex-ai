@@ -4,12 +4,28 @@ Click-by-click steps you (or a teammate) can follow to get every backend
 piece of `clex-ai` healthy. Each section is independent — do them in any
 order.
 
+> **Status snapshot — verified 2026-05-09 via the Cloudflare API**
+>
+> | Item | Status | Notes |
+> | ---- | ------ | ----- |
+> | `CLEX_API_KEY` Pages secret | ✓ set (encrypted) | Visible under Settings → Variables and Secrets. |
+> | `ai.clex.in` custom domain | ✓ active | Cert from Google CA, HTTP-01 validated. |
+> | `api.ai.clex.in` custom domain | ✓ active | Both routes reach the Pages worker. |
+> | D1 `support_messages` table | ✓ created | Migration 0002 applied via wrangler 4.90.0. |
+> | KV `RATE_LIMIT_KV`, `SESSION_KV` | ✓ bound | Confirmed in screenshots. |
+> | D1 `DB` binding to `clex-ai` | ✓ bound | id `e6e97690-7a12-4b2c-837b-f7d2216a6e48`. |
+> | Vercel deploys | ✗ failing on every push | See [§9 Vercel cleanup](#9-vercel-cleanup-removing-the-failing-checks). |
+>
+> **Remaining manual steps if you forked into `Abhinavv-007/clex-ai`**:
+> see [§6](#6-switching-the-cloudflare-pages-source-repo) and [§9](#9-vercel-cleanup-removing-the-failing-checks).
+
 > **TL;DR** for first-time setup
 >
 > 1. [Set the `CLEX_API_KEY` Pages secret](#1-set-clex_api_key-the-nvidia-nim-key) ← unblocks `/api/chat`.
 > 2. [Apply the D1 migrations](#2-apply-d1-migrations-clex-ai-database) ← unblocks support form, key creation, usage logging.
 > 3. [Add `api.ai.clex.in` as a custom domain](#3-attach-apiai clexin-custom-domain) ← stops the `api.ai.clex.in → ai.clex.in` redirect.
 > 4. [Trigger a redeploy](#5-trigger-a-redeploy) and hard-reload the live site.
+> 5. [Disconnect the failing Vercel projects](#9-vercel-cleanup-removing-the-failing-checks) so PRs stop showing red checks.
 
 ---
 
@@ -303,3 +319,95 @@ curl -X POST "https://api.cloudflare.com/client/v4/zones/<zone_id>/purge_cache" 
   -H "Content-Type: application/json" \
   -d '{"files":["https://ai.clex.in/playground.html"]}'
 ```
+
+---
+
+## 9. Vercel cleanup (removing the failing checks)
+
+**Why**: PR pages on the GitHub repo show two red checks —
+`Vercel – clex-in` and `Vercel – clex-in-backend` — that fail on every
+push. The site moved to Cloudflare Pages, so these Vercel deployments are
+both unnecessary **and** never going to succeed (they don't have the
+required env vars or DB bindings). They look scary on PRs and confuse
+contributors.
+
+There are three ways to make them go away — pick whichever is least
+work for you.
+
+### Option A — Add `vercel.json` to skip future builds (already done)
+
+This repo now ships a `vercel.json` at the project root with:
+
+```json
+{
+  "ignoreCommand": "exit 0",
+  "buildCommand": "echo 'Skipping Vercel build — this site deploys from Cloudflare Pages.' && mkdir -p public && echo '<!doctype html><meta http-equiv=\"refresh\" content=\"0;url=https://ai.clex.in\">' > public/index.html",
+  "outputDirectory": "public",
+  "framework": null,
+  "github": { "silent": true, "autoAlias": false }
+}
+```
+
+`ignoreCommand: exit 0` tells Vercel "don't build this commit" — Vercel
+reports the deploy as **Skipped** instead of **Failed**, so PRs stop
+turning red. The fallback `buildCommand` produces a static page that
+just redirects to `ai.clex.in` in case Vercel ignores `ignoreCommand`
+for some reason.
+
+After merging this PR you should see the next push to `main` produce
+either a green check ("Deploy succeeded — redirect to ai.clex.in")
+**or** the deploy disappear entirely. Either is fine.
+
+### Option B — Disconnect the GitHub integration on each Vercel project
+
+This stops Vercel from receiving any future GitHub events, which is
+cleaner than Option A.
+
+1. Sign in to <https://vercel.com/dashboard>.
+2. Find the **clex-in** project (the one that builds the frontend).
+3. **Settings** → **Git** → scroll to "Connected Git Repository" →
+   click **Disconnect**.
+4. Repeat for **clex-in-backend**.
+5. Optional: delete the projects entirely from **Settings → Advanced
+   → Delete Project** if you don't plan to ever deploy them again.
+
+After Option B, no Vercel-related checks will appear on future PRs.
+
+### Option C — Delete the GitHub-Vercel integration (per-org nuclear option)
+
+Removes Vercel from your GitHub account entirely.
+
+1. <https://github.com/settings/installations> → find **Vercel** → click
+   **Configure**.
+2. Either limit Vercel's repo access ("Only select repositories" — and
+   remove `Abhnv07/clex-ai` and `Abhinavv-007/clex-ai` from the list)
+   or **Uninstall** the integration.
+
+Use Option C only if you don't have any other repos that should stay
+on Vercel.
+
+---
+
+## 10. Verifying the IDE fixes locally before merge
+
+Cloudflare Pages auto-deploys on push to `main`. To sanity-check the
+playground locally without waiting for a Pages deploy:
+
+```bash
+git fetch origin
+git checkout devin/<latest-playground-branch>
+# At the repo root — Pages dev needs the same wrangler.toml the
+# real deploy uses.
+npx wrangler pages dev public_assets \
+  --d1=DB \
+  --kv=RATE_LIMIT_KV \
+  --kv=SESSION_KV \
+  --binding APP_ENV=development
+```
+
+Then open <http://localhost:8788/playground.html>. The Cross-Origin-Isolation
+headers in `_headers` are honored by `wrangler pages dev`, so the
+WebContainer sandbox should boot. If it doesn't, check Chrome / Edge
+DevTools → Network → click the request to `playground.html` →
+look for `Cross-Origin-Embedder-Policy: require-corp` and
+`Cross-Origin-Opener-Policy: same-origin` on the response.
