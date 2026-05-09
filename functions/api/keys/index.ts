@@ -10,6 +10,7 @@ import {
 } from '../../lib/d1';
 import { generateClexKey, sha256Hex } from '../../lib/crypto';
 import { clientIp, userAgent } from '../../lib/clientip';
+import { effectivePlanTier, PLAN_LIMITS, isUnlimitedKeys } from '../../lib/plans';
 
 export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   const claims = await verifyFirebaseAuthHeader(env, request);
@@ -65,8 +66,15 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
   const existing = await listUserApiKeys(env, user.id);
   const active = existing.filter((k) => k.revoked_at == null).length;
-  if (active >= 10) {
-    return badRequest('too_many_active_keys_max_10', request, env);
+
+  const tier = effectivePlanTier(user);
+  const tierLimit = PLAN_LIMITS[tier].maxActiveKeys;
+  if (!isUnlimitedKeys(tierLimit) && active >= tierLimit) {
+    return badRequest(
+      `Plan limit reached: ${tier} allows up to ${tierLimit} active key${tierLimit === 1 ? '' : 's'}. Revoke an existing key or upgrade your plan.`,
+      request,
+      env
+    );
   }
 
   const { token, prefix } = generateClexKey();

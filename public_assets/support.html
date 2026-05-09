@@ -134,32 +134,37 @@
               <div>
                 <label for="name"
                   class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Name</label>
-                <input type="text" id="name" required
+                <input type="text" id="name" required maxlength="120"
                   class="w-full bg-[#050505]/50 border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#c9a96e]/30 transition-colors"
                   placeholder="Abhinav Raj" />
               </div>
               <div>
                 <label for="email" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Email
                   address</label>
-                <input type="email" id="email" required
+                <input type="email" id="email" required maxlength="200"
                   class="w-full bg-[#050505]/50 border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#c9a96e]/30 transition-colors"
                   placeholder="abhinav@clex.in" />
               </div>
               <div>
                 <label for="message"
                   class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Message</label>
-                <textarea id="message" rows="4" required
+                <textarea id="message" rows="4" required maxlength="4000"
                   class="w-full bg-[#050505]/50 border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#c9a96e]/30 transition-colors resize-none"
                   placeholder="I have a question about..."></textarea>
               </div>
-              <button type="submit"
-                class="w-full bg-[#c9a96e] text-black font-bold py-3.5 px-4 rounded-xl transition-all hover:bg-[#d4b87a] mt-2 hover:shadow-[0_0_20px_rgba(201,169,110,0.3)]">
+              <button id="contact-submit" type="submit"
+                class="w-full bg-[#c9a96e] text-black font-bold py-3.5 px-4 rounded-xl transition-all hover:bg-[#d4b87a] mt-2 hover:shadow-[0_0_20px_rgba(201,169,110,0.3)] disabled:opacity-60 disabled:cursor-not-allowed">
                 Send Message
               </button>
             </form>
             <div id="form-success"
               class="hidden mt-4 p-3 bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 rounded-lg text-sm text-center">
-              Thanks! We have received your message.
+              Thanks! We have received your message — we'll get back to you within one business day.
+            </div>
+            <div id="form-error"
+              class="hidden mt-4 p-3 bg-red-500/15 border border-red-500/30 text-red-300 rounded-lg text-sm text-center">
+              Couldn't send your message. Please try again or email
+              <a href="mailto:support@abhnv.in" class="underline">support@abhnv.in</a>.
             </div>
           </div>
         </div>
@@ -169,12 +174,19 @@
     <div data-clex-footer></div>
   </div>
 
-  <script src="shared.js?v=4"></script>
+  <script src="shared.js?v=7"></script>
   <script>
     document
       .getElementById("contact-form")
-      ?.addEventListener("submit", (e) => {
+      ?.addEventListener("submit", async (e) => {
         e.preventDefault();
+
+        const form = e.target;
+        const submitBtn = document.getElementById("contact-submit");
+        const successEl = document.getElementById("form-success");
+        const errorEl = document.getElementById("form-error");
+        successEl.classList.add("hidden");
+        errorEl.classList.add("hidden");
 
         const name = document.getElementById("name").value.trim();
         const email = document.getElementById("email").value.trim();
@@ -182,24 +194,43 @@
 
         if (!name || !email || !message) return;
 
-        const subject = encodeURIComponent(`[CLEX Support] Message from ${name}`);
-        const body = encodeURIComponent(
-          `Name: ${name}\nEmail: ${email}\n\n${message}`
-        );
+        submitBtn.disabled = true;
+        const originalLabel = submitBtn.textContent;
+        submitBtn.textContent = "Sending…";
 
-        // Open mailto link to send directly to support email
-        window.location.href = `mailto:abhinav@abhnv.in?subject=${subject}&body=${body}`;
+        try {
+          const res = await fetch("/api/support/contact", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, email, message }),
+          });
 
-        // Also try to POST to server-side endpoint as backup
-        fetch("/api/support/contact", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, message }),
-        }).catch(() => { });
+          if (!res.ok) {
+            let detail = "";
+            try {
+              const data = await res.json();
+              detail = data?.error || "";
+            } catch (_) {
+              // ignore non-JSON error bodies
+            }
+            errorEl.textContent = detail
+              ? `Couldn't send your message: ${detail}`
+              : "Couldn't send your message. Please try again or email support@abhnv.in.";
+            errorEl.classList.remove("hidden");
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalLabel;
+            return;
+          }
 
-        // Show success state
-        e.target.style.display = "none";
-        document.getElementById("form-success").classList.remove("hidden");
+          form.reset();
+          form.style.display = "none";
+          successEl.classList.remove("hidden");
+        } catch (err) {
+          errorEl.textContent = `Couldn't send your message: ${err.message}`;
+          errorEl.classList.remove("hidden");
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalLabel;
+        }
       });
   </script>
 </body>

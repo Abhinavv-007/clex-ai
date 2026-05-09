@@ -33,6 +33,13 @@
   box-sizing: border-box;
 }
 
+/* Force the HTML `hidden` attribute to actually hide elements that would
+   otherwise win on specificity (e.g. `.modal { display: grid }`). Without
+   this, the user-detail modal and the auth screen overlap the shell. */
+[hidden] {
+  display: none !important;
+}
+
 html,
 body {
   margin: 0;
