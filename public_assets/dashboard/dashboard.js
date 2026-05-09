@@ -51,6 +51,12 @@ function fmtNumber(n) {
   return Number(n).toLocaleString();
 }
 
+// Render "Unlimited" when the API serialises an unlimited key cap as null.
+function fmtKeyLimit(n) {
+  if (n === null || n === undefined) return "Unlimited";
+  return Number(n).toLocaleString();
+}
+
 function fmtTime(epoch) {
   if (!epoch) return "—";
   return new Date(epoch * 1000).toLocaleString();
@@ -404,7 +410,7 @@ function renderOverviewStats(me, usage, keys) {
     {
       label: "Active keys",
       value: fmtNumber(activeKeys),
-      meta: `of ${fmtNumber(limits.max_active_keys)} max`,
+      meta: `of ${fmtKeyLimit(limits.max_active_keys)} max`,
     },
   ];
   $("#overview-stats").innerHTML = stats
@@ -694,7 +700,7 @@ async function loadPlan() {
         </div>
         <div class="stat">
           <span class="stat-label">Active keys</span>
-          <span class="stat-value">${fmtNumber(limits.max_active_keys)}</span>
+          <span class="stat-value">${fmtKeyLimit(limits.max_active_keys)}</span>
         </div>
       </div>
     `;

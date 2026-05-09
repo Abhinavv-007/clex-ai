@@ -10,14 +10,26 @@ import { nowSeconds } from './ids';
 export interface PlanLimits {
   perMinute: number;
   perDay: number;
+  // Maximum number of *active* clex_* API keys a user on this tier may hold.
+  // `Infinity` means uncapped (Pro / Developer); JSON serialises this as `null`
+  // and the dashboard renders "Unlimited" when the field is null/Infinity.
+  maxActiveKeys: number;
 }
 
+// Treat any value >= UNLIMITED_KEYS_SENTINEL as "no cap" when rendering or
+// enforcing — useful so we don't depend on Infinity surviving JSON round-trips.
+export const UNLIMITED_KEYS_SENTINEL = 1_000_000;
+
 export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
-  free: { perMinute: 1, perDay: 20 },
-  starter: { perMinute: 5, perDay: 200 },
-  pro: { perMinute: 20, perDay: 2000 },
-  developer: { perMinute: 60, perDay: 100000 },
+  free: { perMinute: 1, perDay: 20, maxActiveKeys: 1 },
+  starter: { perMinute: 5, perDay: 200, maxActiveKeys: 5 },
+  pro: { perMinute: 20, perDay: 1000, maxActiveKeys: UNLIMITED_KEYS_SENTINEL },
+  developer: { perMinute: 60, perDay: 100000, maxActiveKeys: UNLIMITED_KEYS_SENTINEL },
 };
+
+export function isUnlimitedKeys(limit: number): boolean {
+  return !Number.isFinite(limit) || limit >= UNLIMITED_KEYS_SENTINEL;
+}
 
 export interface PlanCatalogEntry {
   tier: PlanTier;
@@ -35,7 +47,7 @@ export const PLAN_CATALOG: PlanCatalogEntry[] = [
     monthlyUsd: 0,
     comingSoon: false,
     limits: PLAN_LIMITS.free,
-    blurb: '20 requests / day · 1 / minute. Great for trying Clex AI.',
+    blurb: '20 requests / day · 1 / minute · 1 API key. Great for trying Clex AI.',
   },
   {
     tier: 'starter',
@@ -43,7 +55,7 @@ export const PLAN_CATALOG: PlanCatalogEntry[] = [
     monthlyUsd: 2,
     comingSoon: true,
     limits: PLAN_LIMITS.starter,
-    blurb: '200 requests / day · 5 / minute. Side projects and prototyping.',
+    blurb: '200 requests / day · 5 / minute · 5 API keys. Side projects and prototyping.',
   },
   {
     tier: 'pro',
@@ -51,7 +63,7 @@ export const PLAN_CATALOG: PlanCatalogEntry[] = [
     monthlyUsd: 5,
     comingSoon: true,
     limits: PLAN_LIMITS.pro,
-    blurb: '2000 requests / day · 20 / minute. Production workloads.',
+    blurb: '1000 requests / day · 20 / minute · unlimited API keys. Production workloads.',
   },
 ];
 
