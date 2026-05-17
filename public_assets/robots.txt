@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Private / auth surfaces
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /playground.html
+Disallow: /login.html
+
+Sitemap: https://ai.clex.in/sitemap.xml
